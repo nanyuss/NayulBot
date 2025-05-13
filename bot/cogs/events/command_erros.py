@@ -6,7 +6,7 @@ from discord.app_commands.errors import (
 	MissingPermissions,
 )
 
-from bot.core import BotCore
+from bot import BotCore
 from bot.utils.others import Permissions, Emoji
 
 log = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ import logging
 
 import os
 from dotenv import load_dotenv
-from bot.core import BotCore
+from bot import BotCore
 
 class ColorizedHandler(logging.StreamHandler):
     COLORS = {
