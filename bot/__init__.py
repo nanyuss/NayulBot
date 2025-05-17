@@ -5,8 +5,10 @@ import os
 import re
 import logging
 import asyncio
+from time import time
 from dotenv import load_dotenv
 
+__version__ = '0.2.0-alpha'
 log = logging.getLogger(__name__)
 load_dotenv()
 os.environ.update(
@@ -108,7 +110,17 @@ class BotCore(commands.AutoShardedBot, BotSetup):
             intents=discord.Intents.all(),
             help_command=None,
         )
+        self.owner_ids = set()
+        self.uptime = time()
+        self.__version__ = __version__
 
+        #Adicionando os IDs dos proprietários definidos no .env.
+        for owner_id in os.getenv('OWNER_IDS', '').split(','):
+            try:
+                self.owner_ids.add(int(owner_id.strip()))
+            except ValueError:
+                log.warning(f'ID de proprietário inválido: {owner_id.strip()}')
+                    
     async def setup_hook(self):
             """Método chamado enquanto o bot está inicinado."""
             await self.load_cogs(self, 'bot/cogs')
@@ -119,6 +131,7 @@ class BotCore(commands.AutoShardedBot, BotSetup):
             """Método chamado quando o bot está pronto."""
             log.info(f'Conectado como {self.user} ({self.user.id}).')
             log.info(f'Latência: {round(self.latency * 1000)}ms.')
+            log.info(f'Versão: {__version__}.')
             log.info(f'discord.py: {discord.__version__}.')
             log.info(f'Python: {os.sys.version.split()[0]}.')
             log.info(f'Servidores: {len(self.guilds)}.')

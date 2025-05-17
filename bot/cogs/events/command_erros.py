@@ -13,7 +13,8 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
 
 class CommandHandler(commands.Cog):
-	def __init__(self, bot):
+	def __init__(self, bot: BotCore):
+		"""Classe que trata os erros dos comandos do bot."""
 		self.bot = bot
 		self.bot.tree.on_error = self.on_app_command_error
 		
