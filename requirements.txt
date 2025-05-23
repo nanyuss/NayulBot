@@ -4,3 +4,5 @@ python-dotenv
 pyyaml
 jishaku
 pydantic
+psutil
+bs4
