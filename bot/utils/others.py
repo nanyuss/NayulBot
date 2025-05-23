@@ -7,64 +7,71 @@ def Permissions() -> dict:
 	"""Carrega as permissões em Português do arquivo permissions.yml."""
 	with open('./bot/utils/resources/permissions.yml', 'r', encoding='utf-8') as file:
 		return yaml.safe_load(file) or {}
-	
 
 @dataclass
 class Emoji:
     """Classe para armazenar os emojis do bot."""
-    accept: str = "'<:accept:1368109598673997826>'"
-    active_developer: str = "'<:active_developer:1368109612900941915>'"
-    add: str = "'<:add:1368109626868105339>'"
-    annotation: str = "'<:annotation:1368109640705114122>'"
-    back: str = "'<:back:1368109654713827389>'"
-    banner: str = "'<:banner:1368109668836053002>'"
-    booster_lv1: str = "'<:booster_lv1:1368109682824187994>'"
-    bug_hunter: str = "'<:bug_hunter:1368109696602607637>'"
-    bug_hunter_level_2: str = "'<:bug_hunter_level_2:1368109710070382665>'"
-    check: str = "'<:check:1368109724268105769>'"
-    crown: str = "'<:crown:1368109738193326110>'"
-    delete: str = "'<:delete:1368109751824678934>'"
-    discord_certified_moderator: str = "'<:discord_certified_moderator:1368109766110478406>'"
-    discord_icon: str = "'<:discord_icon:1368109780060733502>'"
-    early_supporter: str = "'<:early_supporter:1368109793524584480>'"
-    error: str = "'<:error:1368109807478767688>'"
-    exportar: str = "'<:exportar:1368109821789999194>'"
-    footer: str = "'<:footer:1368109837346537572>'"
-    hypesquad: str = "'<:hypesquad:1368109851309506640>'"
-    hypesquad_balance: str = "'<:hypesquad_balance:1368109866006089749>'"
-    hypesquad_bravery: str = "'<:hypesquad_bravery:1368109880107466794>'"
-    hypesquad_brilliance: str = "'<:hypesquad_brilliance:1368109894305316996>'"
-    icon_badge: str = "'<:icon_badge:1368109907970359438>'"
-    icon_calendar: str = "'<:icon_calendar:1368109921920352330>'"
-    icon_category: str = "'<:icon_category:1368109936080584795>'"
-    icon_edit: str = "'<:icon_edit:1368109949963472936>'"
-    icon_emoji: str = "'<:icon_emoji:1368109964064985159>'"
-    icon_role: str = "'<:icon_role:1368109978078150706>'"
-    icon_settings: str = "'<:icon_settings:1368109992342720543>'"
-    icon_user: str = "'<:icon_user:1368110006314074183>'"
-    id_icon: str = "'<:id_icon:1368110020272848946>'"
-    image: str = "'<:image:1368110034424299530>'"
-    importar: str = "'<:importar:1368110048856903742>'"
-    info: str = "'<:info:1368110063029588103>'"
-    left: str = "'<:left:1368110077260726364>'"
-    list: str = "'<:list:1368110091512840293>'"
-    loading_v1: str = "'<a:loading_v1:1368110105853169774>'"
-    loading_v2: str = "'<a:loading_v2:1368110119929380944>'"
-    members: str = "'<:members:1368110133959331890>'"
-    mention: str = "'<:mention:1368790419105779784>'"
-    new_member: str = "'<:new_member:1368110147863314483>'"
-    paleta: str = "'<:paleta:1368110161780277249>'"
-    paper: str = "'<:paper:1368110175663296625>'"
-    partner: str = "'<:partner:1368110189793775647>'"
-    redwarn: str = "'<:redwarn:1368790433202831482>'"
-    reject: str = "'<:reject:1368110204243279912>'"
-    right: str = "'<:right:1368110218252386406>'"
-    send: str = "'<:send:1368110232168955975>'"
-    settings_animated: str = "'<a:settings_animated:1368110245964157020>'"
-    spammer: str = "'<:spammer:1368110259838648341>'"
-    splash: str = "'<:splash:1368110273860472883>'"
-    staff: str = "'<:staff:1368110288112455691>'"
-    unverified_bot: str = "'<:unverified_bot:1368110302050385930>'"
-    verified_bot: str = "'<:verified_bot:1368110316012961884>'"
-    verified_bot_developer: str = "'<:verified_bot_developer:1368110330269536286>'"
-    webhook: str = "'<:webhook:1368110344031178763>'"
+    add = '<:add:1373741312221904956>'
+    annotation = '<:annotation:1373741328118317077>'
+    hypesquad = '<:hypesquad:1373741344056410114>'
+    icon_edit = '<:icon_edit:1373741360129249472>'
+    icon_role = '<:icon_role:1373741375786451104>'
+    icon_settings = '<:icon_settings:1373741391175483514>'
+    image = '<:image:1373741407503646880>'
+    left = '<:left:1373741423589068950>'
+    list = '<:list:1373741439380357120>'
+    members = '<:members:1373741455016722455>'
+    paleta = '<:paleta:1373741470674194589>'
+    paper = '<:paper:1373741486742704190>'
+    partner = '<:partner:1373741501909041184>'
+    right = '<:right:1373741518195654698>'
+    send = '<:send:1373741534100328468>'
+    staff = '<:staff:1373741550177091765>'
+    webhook = '<:webhook:1373741566149001298>'
+    accept = '<:accept:1373741581798080653>'
+    active_developer = '<:active_developer:1373741596712894505>'
+    back = '<:back:1373741611640688792>'
+    banner = '<:banner:1373741626958020660>'
+    booster_lv1 = '<:booster_lv1:1373741642259103804>'
+    bug_hunter = '<:bug_hunter:1373741657207341076>'
+    bug_hunter_level_2 = '<:bug_hunter_level_2:1373741672319680642>'
+    check = '<:check:1373741688442323165>'
+    crown = '<:crown:1373741703458062560>'
+    delete = '<:delete:1373744298264100924>'
+    discord_certified_moderator = '<:discord_certified_moderator:1373741719153279071>'
+    discord_icon = '<:discord_icon:1373741735410139166>'
+    early_supporter = '<:early_supporter:1373741749993996432>'
+    error = '<:error:1373741765093359747>'
+    exportar = '<:exportar:1373741780939440148>'
+    footer = '<:footer:1373741795787411456>'
+    hypesquad_balance = '<:hypesquad_balance:1373741810765135963>'
+    hypesquad_bravery = '<:hypesquad_bravery:1373741825868824746>'
+    hypesquad_brilliance = '<:hypesquad_brilliance:1373741840708141147>'
+    icon_badge = '<:icon_badge:1373741855887589499>'
+    icon_calendar = '<:icon_calendar:1373741871288815627>'
+    icon_category = '<:icon_category:1373741886237442189>'
+    icon_emoji = '<:icon_emoji:1373741902742159471>'
+    icon_user = '<:icon_user:1373741918109962322>'
+    id_icon = '<:id_icon:1373741933830082672>'
+    importar = '<:importar:1373741949428699217>'
+    info = '<:info:1373741965295751319>'
+    loading_v1 = '<a:loading_v1:1373741980852682812>'
+    loading_v2 = '<a:loading_v2:1373741995679285269>'
+    mention = '<:mention:1373742010762264639>'
+    new_member = '<:new_member:1373744312658956444>'
+    python = '<:python:1373742028231409694>'
+    redwarn = '<:redwarn:1373742044207648890>'
+    reject = '<:reject:1373744327792267315>'
+    settings_animated = '<a:settings_animated:1373742061765001248>'
+    spammer = '<:spammer:1373742076612837496>'
+    splash = '<:splash:1373742092534415513>'
+    terminal = '<:terminal:1373742108762046484>'
+    unverified_bot = '<:unverified_bot:1373742123798630562>'
+    verified_bot = '<:verified_bot:1373742138835079310>'
+    verified_bot_developer = '<:verified_bot_developer:1373742154031173652>'
+    wumpus_helper = '<:wumpus_helper:1373742169096982568>'
+
+    @classmethod
+    def as_dict(cls) -> dict:
+        """Retorna os emojis como um dicionário."""
+        return {k: v for k, v in cls.__dict__.items() if not k.startswith("__") and not callable(v) and not k == "as_dict"}

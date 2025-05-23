@@ -36,7 +36,6 @@ async def main():
     async with BotCore() as bot:
         await bot.start(os.getenv('TOKEN'))
 
-
 try:
     asyncio.run(main())
 except KeyboardInterrupt:

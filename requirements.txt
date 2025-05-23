@@ -5,3 +5,4 @@ pyyaml
 jishaku
 pydantic
 psutil
+bs4
