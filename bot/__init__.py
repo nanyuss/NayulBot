@@ -9,6 +9,8 @@ import aiohttp
 from time import time
 from dotenv import load_dotenv
 
+from bot.utils.others import reload_emojis
+
 __version__ = '0.2.0-alpha'
 log = logging.getLogger(__name__)
 load_dotenv()
@@ -137,6 +139,7 @@ class BotSetup:
             file.write(updated_content)
         
         log.info('📦 Classe de emojis atualizada com sucesso.')
+        reload_emojis()
 
 class BotCore(commands.AutoShardedBot, BotSetup):
     """
