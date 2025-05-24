@@ -6,3 +6,4 @@ jishaku
 pydantic
 psutil
 bs4
+unidecode

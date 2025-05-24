@@ -25,7 +25,8 @@ class ShiritoriGame(commands.Cog):
     @app_commands.checks.bot_has_permissions(
         embed_links=True,
         send_messages=True,
-        read_messages=True
+        read_messages=True,
+        add_reactions=True
     )
     async def shiritori(self, inter: discord.Interaction[BotCore]):
         players = [inter.user]
@@ -294,7 +295,6 @@ class LayoutView(ui.LayoutView):
         await asyncio.sleep(10)
 
         while len(players) > 1:
-            word_count += 1
             for player in players.copy():
                 if len(players) == 1:
                     break
@@ -359,6 +359,7 @@ class LayoutView(ui.LayoutView):
 
                         # Palavra válida!
                         used_words.add(word)
+                        word_count += 1
                         previous_word = word
                         await message.add_reaction(Emoji.check)
                         await message_player.delete()
