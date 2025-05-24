@@ -147,7 +147,7 @@ class Container(ui.Container):
                     '`1.` O primeiro jogador irá começar dizendo uma palavra qualquer.\n',
                     '`2.` A próxima palavra deve começar com as duas últimas letras da palavra anterior.\n',
                     '`3.` Não repita palavras já ditas ou perderá a partida.\n',
-                    '`4.` O tempo para responder será de **60 segundos** até 70 palavras válidas usadas, **30 segundos** da palavra válida 71 até a 120, e **15 segundos** a partir da palavra válida 121.\n'
+                    '`4.` O tempo para responder será de 60 segundos até a 50ª palavra válida, 30 segundos da 51ª até a 100ª, e 15 segundos a partir da 101ª\n'
                     '`5.` O jogador que não conseguir pensar em uma palavra dentro do tempo perde a partida.\n'
                 ]
             )))
@@ -281,7 +281,6 @@ class LayoutView(ui.LayoutView):
         players = list(self.players)
         used_words = set()
         previous_word = None
-        word_count = 0
         start_time = datetime.now()
         channel = inter.channel
 
@@ -299,15 +298,16 @@ class LayoutView(ui.LayoutView):
                 if len(players) == 1:
                     break
 
-                time_limit = 60 if len(used_words) < 70 else 30 if len(used_words) < 120 else 15
+                time_limit = 60 if len(used_words) <= 50 else 30 if len(used_words) <= 100 else 15
+                ends_at = int(time.time() + time_limit)
                 start_turn = datetime.now()
 
                 if previous_word:
                     phase_msg = (
-                        '⏱ Tempo para responder: **60 segundos**' if word_count <= 50 else
-                        '⚠️ Atenção! Tempo reduzido para **30 segundos**' if word_count <= 100 else
-                        '🔥 Morte Súbita! Tempo crítico: **15 segundos**'
-                        )
+                        f'⏱ Tempo para responder: **60 segundos** (<t:{ends_at}:R>)' if time_limit == 60 else
+                        f'⚠️ Atenção! Tempo reduzido para **30 segundos** (<t:{ends_at}:R>)' if time_limit == 30 else
+                        f'🔥 Morte Súbita! Tempo crítico: **15 segundos** (<t:{ends_at}:R>)'
+                    )
                     embed_waiting = discord.Embed(
                         description=(
                             f'Digite uma palavra que comece com as duas últimas letras de:\n'
@@ -315,7 +315,7 @@ class LayoutView(ui.LayoutView):
                             f'{phase_msg}'
                         ),
                         color=discord.Color.blurple()
-                    )
+                    ).set_footer(text=f'Palavra #{len(used_words) + 1}')
                 else:
                     embed_waiting = discord.Embed(
                         title='Início do Jogo',
@@ -359,7 +359,6 @@ class LayoutView(ui.LayoutView):
 
                         # Palavra válida!
                         used_words.add(word)
-                        word_count += 1
                         previous_word = word
                         await message.add_reaction(Emoji.check)
                         await message_player.delete()
@@ -389,7 +388,7 @@ class LayoutView(ui.LayoutView):
         )
         embed.set_thumbnail(url=winner.display_avatar.url)
         embed.add_field(name='🏆 Vencedor:', value=winner.mention, inline=False)
-        embed.add_field(name='📊 Palavras usadas:', value=f'```{word_count}```', inline=False)
+        embed.add_field(name='📊 Palavras usadas:', value=f'```{len(used_words)}```', inline=False)
         embed.add_field(name='⏱️ Duração da Partida:', value=f'```{str(end_time - start_time).split('.')[0]}```', inline=False)
 
         await inter.followup.send(embed=embed)
