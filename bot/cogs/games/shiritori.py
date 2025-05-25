@@ -7,7 +7,6 @@ import re
 import asyncio
 import time
 import random
-from bs4 import BeautifulSoup
 from datetime import datetime
 from unidecode import unidecode
 
