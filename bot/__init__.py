@@ -10,7 +10,7 @@ import aiohttp
 from time import time
 from dotenv import load_dotenv
 
-__version__ = '0.2.0-alpha'
+__version__ = '0.2.5-aplha'
 log = logging.getLogger(__name__)
 load_dotenv()
 os.environ.update(
