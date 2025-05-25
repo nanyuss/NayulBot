@@ -278,7 +278,7 @@ class LayoutView(ui.LayoutView):
         return True
 
     async def start_game(self, inter: discord.Interaction):
-        players = list(self.players)
+        players = list(self.confirmed_players)
         used_words = set()
         previous_word = None
         start_time = datetime.now()
@@ -315,7 +315,7 @@ class LayoutView(ui.LayoutView):
                             f'{phase_msg}'
                         ),
                         color=discord.Color.blurple()
-                    ).set_footer(text=f'Palavra #{len(used_words) + 1}')
+                    ).set_footer(text=f'Palavra #{len(used_words)}')
                 else:
                     embed_waiting = discord.Embed(
                         title='Início do Jogo',
