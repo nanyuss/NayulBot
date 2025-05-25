@@ -1,25 +1,12 @@
 from __future__ import annotations
 
-import sys
 import yaml
-import importlib
 from dataclasses import dataclass
 
 def Permissions() -> dict:
 	"""Carrega as permissões em Português do arquivo permissions.yml."""
 	with open('./bot/utils/resources/permissions.yml', 'r', encoding='utf-8') as file:
 		return yaml.safe_load(file) or {}
-
-def reload_emojis():
-    """
-    Recarrega dinamicamente a classe Emoji do módulo bot.utils.others.
-    Use após atualizar o arquivo de emojis.
-    """
-    module_name = "bot.utils.others"
-    if module_name in sys.modules:
-        importlib.reload(sys.modules[module_name])
-    else:
-        importlib.import_module(module_name)
 
 @dataclass
 class Emoji:
