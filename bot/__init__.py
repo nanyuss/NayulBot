@@ -3,13 +3,12 @@ from discord.ext import commands
 
 import os
 import re
+import sys
 import logging
 import asyncio
 import aiohttp
 from time import time
 from dotenv import load_dotenv
-
-from bot.utils.others import reload_emojis
 
 __version__ = '0.2.0-alpha'
 log = logging.getLogger(__name__)
@@ -112,7 +111,6 @@ class BotSetup:
                         log.error(f'Erro ao criar o emoji: {emoji_name}', exc_info=True)
 
         self.generate_emoji_class(emojis_data)
-        log.info('😄 Emojis configurados com sucesso.')
 
     def generate_emoji_class(self, emojis: dict):
         """
@@ -149,11 +147,14 @@ class BotSetup:
             flags=re.DOTALL | re.MULTILINE
         ) # Substitui a classe existente ou adiciona a nova
 
-        with open(output_path, 'w', encoding='utf-8') as file:
-            file.write(updated_content)
+        if updated_content != original_content: # Verifica se a classe foi atualizada
+            with open(output_path, 'w', encoding='utf-8') as file:
+                file.write(updated_content)
+            
+            log.warning('⚙️ Atualizando a classe de emojis e reiniciando o bot para aplicar as alterações...') 
+            os.execv(sys.executable, [sys.executable] + sys.argv) # Reinicia o processo do bot
         
-        log.info('📦 Classe de emojis atualizada com sucesso.')
-        reload_emojis()
+        log.info('😄 Emojis configurados com sucesso.')
 
 class BotCore(commands.AutoShardedBot, BotSetup):
     """
