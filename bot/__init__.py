@@ -9,6 +9,8 @@ import aiohttp
 from time import time
 from dotenv import load_dotenv
 
+from bot.utils.others import reload_emojis
+
 __version__ = '0.2.0-alpha'
 log = logging.getLogger(__name__)
 load_dotenv()
@@ -32,8 +34,7 @@ class BotSetup:
         self._github_raw_base = os.getenv('GITHUB_RAW_BASE')
 
         # Shiritori
-        self.valid_words = set()
-        self.invalid_words = set()
+        self.shiritori_words = set()
 
     async def load_cogs(self, bot: commands.AutoShardedBot, path: str):
         """Carrega as extensões (cogs) do bot."""
@@ -46,9 +47,25 @@ class BotSetup:
                     except Exception:
                         log.exception(f"Erro ao carregar a extensão {file}:")
                         continue
+
+    async def load_words(self, path: str):
+        """Carrega as palavras do shiritori do bot."""
+
+        log.warning('Iniciando configuração das palavras do shiritori...')
+        async with self.session.get(f'{self._github_raw_base}/{path}') as response:
+            if response.status != 200:
+                log.error(f'Erro ao acessar a URL: {response.status}')
+                return
+                
+            text = await response.text()
+            for line in text.splitlines():
+                word = line.strip()
+                if word:
+                    self.shiritori_words.add(word)
+        log.info('😄 Palavras do shiritori configuradas com sucesso.')
     
     async def config_emojis(self, bot: commands.AutoShardedBot, path_emojis: str):
-        """Configura os emojis do bot."""
+        """Carrega e configura os emojis do bot."""
         log.warning('Iniciando configuração dos emojis...')
         existing_emojis = {
             emoji.name: emoji
@@ -57,43 +74,42 @@ class BotSetup:
         formats = ('.png', '.jpg', '.jpeg', '.gif', '.webp')
         emojis_data = {}
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f'{self._github_api_url}/{path_emojis}') as response:
-                if response.status != 200:
-                    log.error(f'Erro ao acessar a URL: {response.status}')
-                    return
+        async with self.session.get(f'{self._github_api_url}/{path_emojis}') as response:
+            if response.status != 200:
+                log.error(f'Erro ao acessar a URL: {response.status}')
+                return
                 
-                files = await response.json()
-                for file in files:
-                    name, ext = os.path.splitext(file['name']) # Separa o nome do arquivo e a extensão
-                    if ext.lower() not in formats: # Verifica se o arquivo é uma imagem
-                        log.warning(f'Formato inválido: {file["name"]}')
+            files = await response.json()
+            for file in files:
+                name, ext = os.path.splitext(file['name']) # Separa o nome do arquivo e a extensão
+                if ext.lower() not in formats: # Verifica se o arquivo é uma imagem
+                    log.warning(f'Formato inválido: {file["name"]}')
+                    continue
+
+                emoji_name = name.lower()
+                if emoji_name in existing_emojis: # Verifica se o emoji já existe se o emoji já existe, não precisa baixar novamente e é adicionado à lista
+                    emoji = existing_emojis[emoji_name]
+                    emoji_mention = f'<a:{emoji.name}:{emoji.id}>' if emoji.animated else f'<:{emoji.name}:{emoji.id}>'
+                    emojis_data[emoji_name] = emoji_mention
+                    continue
+
+                emoji_url = f'{self._github_raw_base}/{path_emojis}/{file["name"]}'
+                async with self.session.get(emoji_url) as img_response:
+                    if img_response.status != 200: # Verifica se a URL do emoji está acessível
+                        log.error(f'Erro ao baixar o emoji: {img_response.status}')
                         continue
 
-                    emoji_name = name.lower()
-                    if emoji_name in existing_emojis: # Verifica se o emoji já existe se o emoji já existe, não precisa baixar novamente e é adicionado à lista
-                        emoji = existing_emojis[emoji_name]
-                        emoji_mention = f'<a:{emoji.name}:{emoji.id}>' if emoji.animated else f'<:{emoji.name}:{emoji.id}>'
-                        emojis_data[emoji_name] = emoji_mention
-                        continue
-
-                    emoji_url = f'{self._github_raw_base}/{path_emojis}/{file["name"]}'
-                    async with session.get(emoji_url) as img_response:
-                        if img_response.status != 200: # Verifica se a URL do emoji está acessível
-                            log.error(f'Erro ao baixar o emoji: {img_response.status}')
-                            continue
-
-                        image_bytes = await img_response.read()
-                        try:
-                            emoji_created = await bot.create_application_emoji(
-                                name=emoji_name,
-                                image=image_bytes
-                            ) # Cria o emoji
-                            emojis_data[emoji_name] = f'<a:{emoji_created.name}:{emoji_created.id}>' if emoji_created.animated else f'<:{emoji_created.name}:{emoji_created.id}>' # Verifica se o emoji é animado ou não e adiciona o emoji à lista
-                            log.info(f'✨ Emoji criado: {emoji_created.name}')
-                            await asyncio.sleep(3)
-                        except Exception:
-                            log.error(f'Erro ao criar o emoji: {emoji_name}', exc_info=True)
+                    image_bytes = await img_response.read()
+                    try:
+                        emoji_created = await bot.create_application_emoji(
+                            name=emoji_name,
+                            image=image_bytes
+                        ) # Cria o emoji
+                        emojis_data[emoji_name] = f'<a:{emoji_created.name}:{emoji_created.id}>' if emoji_created.animated else f'<:{emoji_created.name}:{emoji_created.id}>' # Verifica se o emoji é animado ou não e adiciona o emoji à lista
+                        log.info(f'✨ Emoji criado: {emoji_created.name}')
+                        await asyncio.sleep(3)
+                    except Exception:
+                        log.error(f'Erro ao criar o emoji: {emoji_name}', exc_info=True)
 
         self.generate_emoji_class(emojis_data)
         log.info('😄 Emojis configurados com sucesso.')
@@ -137,6 +153,7 @@ class BotSetup:
             file.write(updated_content)
         
         log.info('📦 Classe de emojis atualizada com sucesso.')
+        reload_emojis()
 
 class BotCore(commands.AutoShardedBot, BotSetup):
     """
@@ -163,6 +180,7 @@ class BotCore(commands.AutoShardedBot, BotSetup):
     async def setup_hook(self):
             """Método chamado enquanto o bot está inicinado."""
             await self.load_cogs(self, 'bot/cogs')
+            await self.load_words('archives/shiritori/pt.txt')
             await self.config_emojis(self, 'media/emojis')
             await self.load_extension('jishaku')
 
@@ -174,6 +192,7 @@ class BotCore(commands.AutoShardedBot, BotSetup):
             log.info(f'discord.py: {discord.__version__}.')
             log.info(f'Python: {os.sys.version.split()[0]}.')
             log.info(f'Servidores: {len(self.guilds)}.')
+            log.info("Proprietários: " + ", ".join(f"{u.name} ({u.id})" if u else f"Desconhecido ({oid})" for u, oid in zip(await asyncio.gather(*[self.fetch_user(oid) for oid in self.owner_ids], return_exceptions=True), self.owner_ids)))
 
     async def start(self, token, *, reconnect = True):
         """Método chamado para iniciar o bot."""

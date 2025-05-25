@@ -7,7 +7,6 @@ import re
 import asyncio
 import time
 import random
-from bs4 import BeautifulSoup
 from datetime import datetime
 from unidecode import unidecode
 
@@ -237,48 +236,12 @@ class LayoutView(ui.LayoutView):
 
     async def validate_word(self, word: str, inter: discord.Interaction[BotCore]) -> bool:
         if len(word) < 3 or not re.search(r'[aeiou].$|.[aeiou]$', word):
-            inter.client.invalid_words.add(word)
             return False
 
-        if word in inter.client.valid_words:
-            return True
-        if word in inter.client.invalid_words:
-            return False
-
-        url = f'https://www.dicio.com.br/{word}/'
-        try:
-            async with inter.client.session.get(url) as response:
-                if response.status != 200:
-                    inter.client.invalid_words.add(word)
-                    return False
-
-                html = await response.text()
-                soup = BeautifulSoup(html, 'html.parser')
-
-                definition = soup.find('p', class_='significado')
-                if not definition or len(definition.text.strip()) < 10:
-                    inter.client.invalid_words.add(word)
-                    return False
-
-                word_class = soup.find('span', class_='cl')
-                if word_class:
-                    blocklist = {
-                        'símbolo', 'abreviação', 'letra', 'sigla',
-                        'sufixo', 'prefixo', 'onomatopeia',
-                        'abreviado', 'interjeição'
-                    }
-                    if any(term in word_class.text.lower() for term in blocklist):
-                        inter.client.invalid_words.add(word)
-                        return False
-
-        except Exception:
-            return False
-
-        inter.client.valid_words.add(word)
-        return True
+        return word in inter.client.shiritori_words
 
     async def start_game(self, inter: discord.Interaction):
-        players = list(self.players)
+        players = list(self.confirmed_players)
         used_words = set()
         previous_word = None
         start_time = datetime.now()
@@ -315,7 +278,7 @@ class LayoutView(ui.LayoutView):
                             f'{phase_msg}'
                         ),
                         color=discord.Color.blurple()
-                    ).set_footer(text=f'Palavra #{len(used_words) + 1}')
+                    ).set_footer(text=f'Palavra #{len(used_words)}')
                 else:
                     embed_waiting = discord.Embed(
                         title='Início do Jogo',
