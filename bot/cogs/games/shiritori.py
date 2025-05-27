@@ -124,23 +124,13 @@ class ConfirmStart(ui.Button):
         ))
         await self.view_instance.start_game(inter)
 
-class Container(ui.Container):
-    def __init__(self, view: 'LayoutView'):
-        super().__init__(accent_colour=16775930)
+class InstructionsButton(ui.Button):
+    def __init__(self):
+        super().__init__(label='Instruções', emoji=Emoji.info, style=discord.ButtonStyle.gray)
 
-        self.add_item(ui.TextDisplay(
-            ''.join(
-                [
-                    '### Shiritori╺╸Jogo de Palavras\n\n',
-                    'Os jogadores devem digitar uma palavra que comece com as duas últimas letras da palavra dita pelo jogador anterior. Irei verifica se a palavra é válida e continua o jogo. Aqui está um exemplo:\n',
-                    '> Abel**ha** -> **Ha**mister\n\n'
-                ]
-            )))
-        
-        self.add_item(ui.Separator())
-
-        self.add_item(ui.TextDisplay(
-            ''.join(
+    async def callback(self, inter: discord.Interaction[BotCore]):
+        embed = discord.Embed(
+            description=''.join(
                 [
                     '### Instruções do Jogo:\n',
                     '`1.` O primeiro jogador irá começar dizendo uma palavra qualquer.\n',
@@ -148,6 +138,26 @@ class Container(ui.Container):
                     '`3.` Não repita palavras já ditas ou perderá a partida.\n',
                     '`4.` O tempo para responder será de 60 segundos até a 50ª palavra válida, 30 segundos da 51ª até a 100ª, e 15 segundos a partir da 101ª\n'
                     '`5.` O jogador que não conseguir pensar em uma palavra dentro do tempo perde a partida.\n'
+                ]
+            ),
+            color=discord.Color.blurple()
+        )
+        await inter.response.send_message(embed=embed, ephemeral=True)   
+
+class Container(ui.Container):
+    def __init__(self, view: 'LayoutView'):
+        super().__init__(accent_colour=16775930)
+
+        self.add_item(ui.MediaGallery(
+            discord.components.MediaGalleryItem('https://media.discordapp.net/attachments/1352188567157342290/1376320134351945838/menor.png?ex=6834e582&is=68339402&hm=7ce914929729947e82e6d3128cbfd7ed4dcd1bff81d0930485b8060dfdb2330d&=&format=webp&quality=lossless&width=1680&height=328')
+        ))
+
+        self.add_item(ui.TextDisplay(
+            ''.join(
+                [
+                    '### Shiritori╺╸Jogo de Palavras\n\n',
+                    'Os jogadores devem digitar uma palavra que comece com as duas últimas letras da palavra dita pelo jogador anterior. Verificarei se a palavra é válida e continua o jogo. Aqui está um exemplo:\n',
+                    '> Abel**ha** -> **Ha**mister\n\n'
                 ]
             )))
         
@@ -180,7 +190,6 @@ class Container(ui.Container):
             f'-# ⏳ Os jogadores têm até <t:{view.time_start}:T> (<t:{view.time_start}:R>) para confirmar sua participação.'
         ))
 
-
 class LayoutView(ui.LayoutView):
     def __init__(self, author: discord.Member, players: list[discord.Member]):
         super().__init__(timeout=300)
@@ -193,7 +202,7 @@ class LayoutView(ui.LayoutView):
         self.add_item(self.container)
 
         self.confirm_button = ConfirmStart(self)
-        self.add_item(ui.ActionRow(self.confirm_button))
+        self.add_item(ui.ActionRow(*[self.confirm_button, InstructionsButton()]))
 
     async def disable_all(self):
         # Desativar todos os botões na container
