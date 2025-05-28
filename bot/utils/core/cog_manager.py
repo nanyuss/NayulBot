@@ -1,6 +1,9 @@
 import os
 import logging
-from discord.ext import commands
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bot import BotCore
 
 log = logging.getLogger(__name__)
 
@@ -9,7 +12,7 @@ class CogManager:
     def __init__(self, path: str = 'bot/cogs'):
         self.path = path
 
-    async def load_cogs(self, bot: commands.AutoShardedBot):
+    async def load_cogs(self, bot: 'BotCore'):
         """ Carrega todas as extensões do bot. """
 
         for root, _, files in os.walk(self.path.replace('/', '.')): # Caminho para as extensões
@@ -24,7 +27,7 @@ class CogManager:
                         log.exception(f'Erro ao carregar a extensão {file}:')
                         continue
 
-    async def reload_cogs(self, bot: commands.AutoShardedBot):
+    async def reload_cogs(self, bot: 'BotCore'):
         """ Recarrega todas as extensões do bot. """
         for root, _, files in os.walk(self.path.replace('/', '.')):
             for file in files:
@@ -38,7 +41,7 @@ class CogManager:
                         log.exception(f'Erro ao recarregar a extensão {file}:')
                         continue
 
-    async def unload_cogs(self, bot: commands.AutoShardedBot):
+    async def unload_cogs(self, bot: 'BotCore'):
         """ Descarrega as extensões do bot. """
         for root, _, files in os.walk(self.path.replace('/', '.')):
             for file in files:
@@ -52,7 +55,7 @@ class CogManager:
                         log.exception(f'Erro ao descarregar a extensão {file}:')
                         continue
     
-    async def reload_cog_one(self, bot: commands.AutoShardedBot, extension: str):
+    async def reload_cog_one(self, bot: 'BotCore', extension: str):
         """ Recarrega uma extensão do bot. """
         try:
             await bot.reload_extension(extension)
@@ -60,7 +63,7 @@ class CogManager:
         except Exception:
             log.exception(f'Erro ao recarregar a extensão {extension}:')
 
-    async def load_cog_one(self, bot: commands.AutoShardedBot, extension: str):
+    async def load_cog_one(self, bot: 'BotCore', extension: str):
         """ Carrega uma extensão do bot. """
         try:
             await bot.load_extension(extension)
@@ -68,7 +71,7 @@ class CogManager:
         except Exception:
             log.exception(f'Erro ao carregar a extensão {extension}:')
     
-    async def unload_cog_one(self, bot: commands.AutoShardedBot, extension: str):
+    async def unload_cog_one(self, bot: 'BotCore', extension: str):
         """ Descarrega uma extensão do bot. """
         try:
             await bot.unload_extension(extension)

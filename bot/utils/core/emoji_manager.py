@@ -3,7 +3,10 @@ import re
 import sys
 import asyncio
 import logging
-from discord.ext import commands
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bot import BotCore
 
 from bot.utils.env import ENV
 
@@ -14,7 +17,7 @@ class EmojiManager:
     def __init__(self):
         pass
 
-    async def config_emojis(self, bot: commands.AutoShardedBot , path: str = 'media/emojis'):
+    async def config_emojis(self, bot: 'BotCore' , path: str = 'media/emojis'):
         """Carrega e configura os emojis do bot."""
 
         log.warning('Iniciando configuração dos emojis...')

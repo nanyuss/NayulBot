@@ -1,6 +1,8 @@
 import logging
+from typing import TYPE_CHECKING
 
-from discord.ext import commands
+if TYPE_CHECKING:
+    from bot import BotCore
 
 from bot.utils.env import ENV
 
@@ -12,7 +14,7 @@ class WordManager:
     def __init__(self):
         self.shiritori_words = set()
 
-    async def load_words(self, bot: commands.AutoShardedBot, path: str = 'archives/shiritori/pt.txt'):
+    async def load_words(self, bot: 'BotCore', path: str = 'archives/shiritori/pt.txt'):
         """Carrega as palavras do shiritori do bot."""
 
         print(ENV.GITHUB_RAW_BASE + path)
