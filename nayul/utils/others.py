@@ -74,4 +74,4 @@ class Emoji:
     @classmethod
     def as_dict(cls) -> dict:
         """Retorna os emojis como um dicionário."""
-        return {k: v for k, v in cls.__dict__.items() if not k.startswith("__") and not callable(v) and not k == "as_dict"}
+        return {k: v for k, v in cls.__dict__.items() if not k.startswith("__")}
