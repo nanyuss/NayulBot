@@ -71,22 +71,23 @@ class EmojiManager:
     async def generate_emoji_class(self, emojis: dict):
         """Gera uma classe ou atualiza a classe de emojis automaticamente."""
 
-        output_path = os.path.join('nayul', 'utils', 'others.py')
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        output_path = os.path.join(base_dir, 'utils', 'others.py')
             
         class_lines = [
             '@dataclass\n',
-            'class Emojis:\n',
+            'class Emoji:\n',
             '    """Classe para armazenar os emojis do bot."""\n'
         ]
         for key, value in emojis.items():
-            class_lines.append(f'   {key.upper()} = {value!r}\n')
+            class_lines.append(f'    {key} = {value!r}\n')
 
         class_lines += [
-            '',
-            '   @classmethod\n',
-            '   def as_dict(cls) -> dict:\n',
-            '       """Retorna os emojis como um dicionário."""\n',
-            '       return {k: v for k, v in cls.__dict__.items() if not k.startswith("__")}\n'
+            '\n',
+            '    @classmethod\n',
+            '    def as_dict(cls) -> dict:\n',
+            '        """Retorna os emojis como um dicionário."""\n',
+            '        return {k: v for k, v in cls.__dict__.items() if not k.startswith("__")}\n'
         ]
         new_class = ''.join(class_lines)
 
@@ -94,7 +95,7 @@ class EmojiManager:
             existing_content = file.read()
 
         updated_content = re.sub(
-            r'@dataclass\s+class Emojis:.*?(?=^@|\Z)',
+            r'@dataclass\s+class Emoji:.*?(?=^@|\Z)',
             new_class,
             existing_content,
             flags=re.DOTALL | re.MULTILINE
