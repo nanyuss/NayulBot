@@ -6,9 +6,9 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from bot import BotCore
+    from nayul import NayulCore
 
-from bot.utils.env import ENV
+from env import ENV
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class EmojiManager:
     def __init__(self):
         pass
 
-    async def config_emojis(self, bot: 'BotCore' , path: str = 'media/emojis'):
+    async def config_emojis(self, bot: 'NayulCore' , path: str = 'media/emojis'):
         """Carrega e configura os emojis do bot."""
 
         log.warning('Iniciando configuração dos emojis...')
@@ -71,7 +71,7 @@ class EmojiManager:
     async def generate_emoji_class(self, emojis: dict):
         """Gera uma classe ou atualiza a classe de emojis automaticamente."""
 
-        output_path = os.path.join('bot', 'utils', 'others.py')
+        output_path = os.path.join('nayul', 'utils', 'others.py')
             
         class_lines = [
             '@dataclass\n',

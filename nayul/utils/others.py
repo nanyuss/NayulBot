@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 def Permissions() -> dict:
 	"""Carrega as permissões em Português do arquivo permissions.yml."""
-	with open('./bot/utils/resources/permissions.yml', 'r', encoding='utf-8') as file:
+	with open('./nayul/utils/resources/permissions.yml', 'r', encoding='utf-8') as file:
 		return yaml.safe_load(file) or {}
 
 @dataclass

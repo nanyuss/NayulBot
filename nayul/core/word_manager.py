@@ -1,10 +1,10 @@
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
-    from bot import BotCore
+    from nayul import NayulCore
 
-from bot.utils.env import ENV
+from env import ENV
 
 log = logging.getLogger(__name__)
 
@@ -12,12 +12,11 @@ class WordManager:
     """Classe responsável por gerenciar as palavras do jogo Shiritori."""
 
     def __init__(self):
-        self.shiritori_words = set()
+        self.shiritori_words: Set[str] = set()
 
-    async def load_words(self, bot: 'BotCore', path: str = 'archives/shiritori/pt.txt'):
+    async def load_words(self, bot: 'NayulCore', path: str = 'archives/shiritori/pt.txt'):
         """Carrega as palavras do shiritori do bot."""
 
-        print(ENV.GITHUB_RAW_BASE + path)
         log.warning('Iniciando configuração das palavras do shiritori...')
         async with bot.session.get(f'{ENV.GITHUB_RAW_BASE}/{path}') as response:
             if response.status != 200:

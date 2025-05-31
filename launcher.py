@@ -1,9 +1,8 @@
 import asyncio
 import logging
 
-import os
-from dotenv import load_dotenv
-from bot import BotCore
+from env import ENV
+from nayul import NayulCore
 
 class ColorizedHandler(logging.StreamHandler):
     COLORS = {
@@ -28,13 +27,12 @@ handler.setFormatter(formatter)
 logging.basicConfig(level=logging.INFO, handlers=[handler])
 log = logging.getLogger(__name__)
 
-load_dotenv()
 log.info('Iniciando o bot...')
 
 # Inicia a aplicação.
 async def main():
-    async with BotCore() as bot:
-        await bot.start(os.getenv('TOKEN'))
+    async with NayulCore() as bot:
+        await bot.start(ENV.TOKEN)
 
 try:
     asyncio.run(main())

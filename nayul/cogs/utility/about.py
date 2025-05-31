@@ -1,50 +1,23 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from discord import ui
 
 import time
 import psutil
 import platform
 from datetime import timedelta
 
-from bot import BotCore
-
-class SelectPatchNotes(ui.Select):
-    """Classe que representa um select para as notas de versão do bot."""
-
-    def __init__(self):
-        options = [
-            discord.SelectOption(label='Versão 0.1.0 (Atual)', value='v0.1.0', description='Atualizado em 01/10/2023'),
-        ]
-        super().__init__(placeholder='Selecione uma versão...', options=options)
-
-    async def callback(self, inter: discord.Interaction[BotCore]):
-        """Callback do select que mostra as notas de versão."""
-
-        await inter.response.send_message('Nenhuma nota de versão encontrada.', ephemeral=True)
-
-class PatchNotesView(ui.View):
-    """Classe que representa uma view para as notas de versão do bot."""
-
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.add_item(SelectPatchNotes())
-
-    async def on_timeout(self):
-        """Callback quando a view expira."""
-        for item in self.children:
-            item.disabled = True
-        await self.message.edit(view=self)
+import nayul
+from nayul import NayulCore
 
 class AboutBot(commands.Cog):
     """Classe que contém os comandos de utilidade do bot."""
 
-    def __init__(self, bot: BotCore):
-        self.bot = bot
+    def __init__(self, nayul: NayulCore):
+        self.nayul = nayul
 
     @app_commands.command(name='ping', description='Mostra informações sobre a latência do bot.')
-    async def ping(self, inter: discord.Interaction[BotCore]):
+    async def ping(self, inter: discord.Interaction[NayulCore]):
         """Comando que verifica a latência do bot."""
 
         start = time.perf_counter()
@@ -61,7 +34,7 @@ class AboutBot(commands.Cog):
                     )
 
     @app_commands.command(name='botinfo', description='Mostra informações sobre o bot.')
-    async def botinfo(self, inter: discord.Interaction[BotCore]):
+    async def botinfo(self, inter: discord.Interaction[NayulCore]):
         """Comando que mostra informações sobre o bot."""
 
         embed = discord.Embed(title=f'Informações sobre {inter.client.user.name}', color=discord.Color.blurple())
@@ -70,7 +43,7 @@ class AboutBot(commands.Cog):
             f'SO:               {platform.system()} {platform.release()}\n'
             f'Python:           {platform.python_version()}\n'
             f'Discord.py:       {discord.__version__}\n'
-            f'Versão:           {inter.client.__version__}\n'
+            f'Versão:           {nayul.__version__}\n'
             f'```'
         )
         embed.set_thumbnail(url=inter.client.user.display_avatar.url)
@@ -94,15 +67,6 @@ class AboutBot(commands.Cog):
             ),
             inline=False
         )
-        embed.add_field(
-            name='📌 Links',
-            value=(
-                '[discord.py](https://discordpy.readthedocs.io/en/stable/api.html)\n'
-                '[MongoDB](https://www.mongodb.com/)\n'
-                '[Nanyus (dev)](https://github.com/nanyuss)'
-            ),
-            inline=False
-        )
 
         owner = inter.client.get_user(list(inter.client.owner_ids)[0])
 
@@ -113,5 +77,5 @@ class AboutBot(commands.Cog):
 
         await inter.response.send_message(embed=embed)
 
-async def setup(bot: BotCore):
-    await bot.add_cog(AboutBot(bot))
+async def setup(nayul: NayulCore):
+    await nayul.add_cog(AboutBot(nayul))

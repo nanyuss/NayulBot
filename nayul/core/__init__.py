@@ -8,12 +8,11 @@ import aiohttp
 from time import time
 from dotenv import load_dotenv
 
-from bot.utils.env import ENV
-from bot.utils.core.emoji_manager import EmojiManager
-from bot.utils.core.word_manager import WordManager
-from bot.utils.core.cog_manager import CogManager
+from env import ENV
+from .emoji_manager import EmojiManager
+from .word_manager import WordManager
+from .cog_manager import CogManager
 
-__version__ = '0.3.0-beta'
 log = logging.getLogger(__name__)
 load_dotenv()
 os.environ.update(
@@ -25,7 +24,7 @@ os.environ.update(
     }
 )
 
-class BotCore(commands.AutoShardedBot):
+class NayulCore(commands.AutoShardedBot):
     """
     Esta classe é responsável por inicializar o bot, carregar as extensões e gerenciar os eventos.
     """
@@ -42,7 +41,6 @@ class BotCore(commands.AutoShardedBot):
         #------- atributos do bot -------#
         self.owner_ids = set()
         self.uptime = time()
-        self.__version__ = __version__
 
         #------- classes de configuração do bot -------#
         self.session = aiohttp.ClientSession()
@@ -59,16 +57,15 @@ class BotCore(commands.AutoShardedBot):
                     
     async def setup_hook(self):
             """Método chamado enquanto o bot está inicinado."""
-            await self.cog_manager.load_cogs(self)
             await self.word_manager.load_words(self, 'archives/shiritori/pt.txt')
             await self.emoji_manager.config_emojis(self, 'media/emojis')
+            await self.cog_manager.load_cogs(self)
             await self.load_extension('jishaku') 
 
     async def on_ready(self):
             """Método chamado quando o bot está pronto."""
             log.info(f'Conectado como {self.user} ({self.user.id}).')
             log.info(f'Latência: {round(self.latency * 1000)}ms.')
-            log.info(f'Versão: {__version__}.')
             log.info(f'discord.py: {discord.__version__}.')
             log.info(f'Python: {os.sys.version.split()[0]}.')
             log.info(f'Servidores: {len(self.guilds)}.')
