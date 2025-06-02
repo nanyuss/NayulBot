@@ -12,13 +12,13 @@ class WordManager:
     """Classe responsável por gerenciar as palavras do jogo Shiritori."""
 
     def __init__(self):
-        self.shiritori_words: Set[str] = set()
+        self.words_list: Set[str] = set()
 
-    async def load_words(self, bot: 'NayulCore', path: str = 'archives/shiritori/pt.txt'):
+    async def load_words(self, bot: 'NayulCore'):
         """Carrega as palavras do shiritori do bot."""
 
-        log.warning('Iniciando configuração das palavras do shiritori...')
-        async with bot.session.get(f'{ENV.GITHUB_RAW_BASE}/{path}') as response:
+        log.warning('Iniciando configuração das palavras...')
+        async with bot.session.get(f'{ENV.INTERNAL_API}/words/pt.txt') as response:
             if response.status != 200:
                 log.critical(f'Erro ao acessar a URL: {response.status}')
                 return
@@ -27,5 +27,5 @@ class WordManager:
             for line in text.splitlines():
                 word = line.strip()
                 if word:
-                    self.shiritori_words.add(word)
-        log.info('😄 Palavras do shiritori configuradas com sucesso.')
+                    self.words_list.add(word)
+        log.info('😄 Lista de palavras carregadas com sucesso.')

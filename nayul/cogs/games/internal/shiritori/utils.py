@@ -23,7 +23,7 @@ def validate_word_shiritori(word: str, inter: discord.Interaction[NayulCore]) ->
     if len(word) < 3 or not re.search(r'[aeiou].$|.[aeiou]$', word):
         return False
     
-    return word in inter.client.word_manager.shiritori_words
+    return word in inter.client.word_manager.words_list
 
 def get_time_limit(used_words_count: int) -> int:
     if used_words_count <= 50:

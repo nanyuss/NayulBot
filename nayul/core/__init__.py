@@ -57,8 +57,8 @@ class NayulCore(commands.AutoShardedBot):
                     
     async def setup_hook(self):
             """Método chamado enquanto o bot está inicinado."""
-            await self.word_manager.load_words(self, 'archives/shiritori/pt.txt')
-            await self.emoji_manager.config_emojis(self, 'media/emojis')
+            await self.word_manager.load_words(self)
+            await self.emoji_manager.config_emojis(self)
             await self.cog_manager.load_cogs(self)
             await self.load_extension('jishaku') 
 
