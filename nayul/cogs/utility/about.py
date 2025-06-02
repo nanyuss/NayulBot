@@ -60,7 +60,7 @@ class AboutBot(commands.Cog):
         embed.add_field(
             name='⚙️ Desempenho',
             value=(
-                f'**Uptime:** `{str(timedelta(seconds=int(time.time() - self.bot.uptime)))}`\n'
+                f'**Uptime:** `{str(timedelta(seconds=int(time.time() - inter.client.uptime)))}`\n'
                 f'**Latência:** `{round(inter.client.latency * 1000)}ms`\n'
                 f'**CPU:** `{psutil.cpu_percent()}%`\n'
                 f'**Memória:** `{round(psutil.virtual_memory().percent, 2)}%`'

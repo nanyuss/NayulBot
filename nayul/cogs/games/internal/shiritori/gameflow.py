@@ -161,4 +161,4 @@ async def start_game_shiritori(view: 'MainView', inter: discord.Interaction[Nayu
     embed.add_field(name='⏱️ Duração da Partida:', value=f'```{str(end_time_game - start_time_game).split(".")[0]}```', inline=False)
 
     from .views import PlayerStatusSelectView # Evitar importação circular
-    await inter.followup.send(embed=embed, view=PlayerStatusSelectView(players_stats))
+    await inter.channel.send(embed=embed, view=PlayerStatusSelectView(players_stats))

@@ -17,7 +17,7 @@ class EmojiManager:
     def __init__(self):
         pass
 
-    async def config_emojis(self, bot: 'NayulCore' , path: str = 'media/emojis'):
+    async def config_emojis(self, bot: 'NayulCore'):
         """Carrega e configura os emojis do bot."""
 
         log.warning('Iniciando configuração dos emojis...')
@@ -25,7 +25,7 @@ class EmojiManager:
         formats = ('.png', '.jpg', '.jpeg', '.gif', '.webp')
         emojis_data = {}
 
-        async with bot.session.get(f'{ENV.GITHUB_API_URL}/{path}') as response:
+        async with bot.session.get(f'{ENV.INTERNAL_API}/emojis') as response:
             if response.status != 200:
                 log.critical(f'Erro ao acessar a URL: {response.status}') 
                 return
@@ -34,9 +34,9 @@ class EmojiManager:
             semaphore = asyncio.Semaphore(5)  # Limita o número de downloads simultâneos
 
             async def process_emoji(file: dict):
-                name, ext = os.path.splitext(file['name'])
+                name, ext = os.path.splitext(file['filename'])
                 if ext.lower() not in formats:
-                    log.warning(f'Formato inválido: {file["name"]}')
+                    log.warning(f'Formato inválido: {file["filename"]}')
                     return
                 
                 emoji_name = name.lower()
@@ -46,10 +46,9 @@ class EmojiManager:
                     emojis_data[emoji_name] = emoji_mention
                     return
                 
-                emoji_url = f'{ENV.GITHUB_RAW_BASE}/{path}/{file["name"]}'
                 async with semaphore:
                     try:
-                        async with bot.session.get(emoji_url) as img_response:
+                        async with bot.session.get(file['url']) as img_response:
                             if img_response.status != 200:
                                 log.critical(f'Erro ao baixar o emoji: {img_response.status}')
                                 return
