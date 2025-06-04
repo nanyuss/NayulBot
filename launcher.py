@@ -31,8 +31,8 @@ log.info('Iniciando o bot...')
 
 # Inicia a aplicação.
 async def main():
-    async with NayulCore() as bot:
-        await bot.start(ENV.TOKEN)
+    async with NayulCore() as nayul:
+        await nayul.start(ENV.TOKEN)
 
 try:
     asyncio.run(main())
