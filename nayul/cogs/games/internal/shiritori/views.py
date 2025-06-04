@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Dict
 from nayul import NayulCore
 from .utils import configure_player_button
 from .types import PlayerStats
-from nayul.utils.others import Emoji
+from nayul.utils.emojis import Emoji
 
 if TYPE_CHECKING:
     from .components import MainView

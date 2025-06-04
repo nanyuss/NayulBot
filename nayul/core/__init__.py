@@ -12,6 +12,7 @@ from env import ENV
 from .emoji_manager import EmojiManager
 from .word_manager import WordManager
 from .cog_manager import CogManager
+from database import DatabaseClient
 
 log = logging.getLogger(__name__)
 load_dotenv()
@@ -43,6 +44,7 @@ class NayulCore(commands.AutoShardedBot):
         self.uptime = time()
 
         #------- classes de configuração do bot -------#
+        self.db: DatabaseClient = None
         self.session = aiohttp.ClientSession()
         self.cog_manager = CogManager()
         self.emoji_manager = EmojiManager()
@@ -57,6 +59,11 @@ class NayulCore(commands.AutoShardedBot):
                     
     async def setup_hook(self):
             """Método chamado enquanto o bot está inicinado."""
+            try:
+                self.db = await DatabaseClient.connect()
+            except Exception:
+                self.close()
+
             await self.word_manager.load_words(self)
             await self.emoji_manager.config_emojis(self)
             await self.cog_manager.load_cogs(self)
@@ -73,7 +80,7 @@ class NayulCore(commands.AutoShardedBot):
 
     async def start(self, token, *, reconnect = True):
         """Método chamado para iniciar o bot."""
-        #self.db = None
+            
         return await super().start(token, reconnect=reconnect)
     
     async def close(self):

@@ -7,7 +7,9 @@ from discord.app_commands.errors import (
 )
 
 from nayul import NayulCore
-from nayul.utils.others import Permissions, Emoji
+from nayul.utils.emojis import Emoji
+from nayul.utils.others import Permissions
+
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -18,7 +20,8 @@ class GlobalErrorHandler(commands.Cog):
 		self.nayul = nayul
 		self.nayul.tree.on_error = self.on_app_command_error
 		
-	async def on_app_command_error(self, inter: discord.Interaction[NayulCore], error: Exception): #Função que trata erros nos comandos slash.
+	async def on_app_command_error(self, inter: discord.Interaction[NayulCore], error: Exception):
+		"""Função que trata os erros dos comandos do bot"""
 		_P = Permissions()
 		
 		if inter.command is not None: #Verifica se o comando existe (para não dar erro 404)

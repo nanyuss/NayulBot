@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from .components import MainView
 
 from nayul import NayulCore
-from nayul.utils.others import Emoji
+from nayul.utils.emojis import Emoji
 from .utils import (
     validate_word_shiritori,
     get_time_limit,
