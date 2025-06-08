@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .components import MainView
 
-from nayul import NayulCore
-from nayul.utils.others import Emoji
+from src import NayulCore
+from src.utils.emojis import Emoji
 from .utils import (
     validate_word_shiritori,
     get_time_limit,
@@ -104,7 +104,7 @@ async def start_game_shiritori(view: 'MainView', inter: discord.Interaction[Nayu
                     if word in used_words:
                         embed = discord.Embed(
                             title='Palavra Repetida!',
-                            description=f'❌ {player.mention}, a palavra **{word}** já foi usada. Você foi eliminado.',
+                            description=f'{Emoji.error} {player.mention}, a palavra **{word}** já foi usada. Você foi eliminado.',
                             color=discord.Color.red()
                         )
                 

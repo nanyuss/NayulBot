@@ -6,8 +6,9 @@ import logging
 import asyncio
 from typing import Set
 
-from nayul import NayulCore
-from nayul.utils.others import Emoji
+from src import NayulCore
+from src.utils.emojis import Emoji
+from src.utils.others import format_api_url
 from .utils import configure_player_button
 from .gameflow import start_game_shiritori
 from .views import ConfirmPlayer, SelectPlayers, ConfirmStartGame
@@ -98,7 +99,7 @@ class Container(ui.Container):
         self.add_item(
             ui.MediaGallery(
                 discord.components.MediaGalleryItem(
-                    media='https://i.postimg.cc/6pQXcf8c/banner-shiritori.png',
+                    media=format_api_url('images/shiritori_banner.png'),
                     description='Banner do jogo Shiritori by arrthur_.'
                 )
             )

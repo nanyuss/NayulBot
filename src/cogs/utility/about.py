@@ -7,8 +7,8 @@ import psutil
 import platform
 from datetime import timedelta
 
-import nayul
-from nayul import NayulCore
+import src
+from src import NayulCore
 
 class AboutBot(commands.Cog):
     """Classe que contém os comandos de utilidade do bot."""
@@ -43,7 +43,7 @@ class AboutBot(commands.Cog):
             f'SO:               {platform.system()} {platform.release()}\n'
             f'Python:           {platform.python_version()}\n'
             f'Discord.py:       {discord.__version__}\n'
-            f'Versão:           {nayul.__version__}\n'
+            f'Versão:           {src.__version__}\n'
             f'```'
         )
         embed.set_thumbnail(url=inter.client.user.display_avatar.url)
@@ -53,7 +53,6 @@ class AboutBot(commands.Cog):
             value=(
                 f'**Servidores:** `{len(inter.client.guilds)}`\n'
                 f'**Usuários:** `{len(set(inter.client.users))}`\n'
-                f'**Comandos:** `{len(inter.client.tree.get_commands())}`\n'
             ),
             inline=False
         )

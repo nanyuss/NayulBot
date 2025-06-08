@@ -6,8 +6,10 @@ from discord.app_commands.errors import (
 	MissingPermissions,
 )
 
-from nayul import NayulCore
-from nayul.utils.others import Permissions, Emoji
+from src import NayulCore
+from src.utils.emojis import Emoji
+from src.utils.others import Permissions
+
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -18,7 +20,8 @@ class GlobalErrorHandler(commands.Cog):
 		self.nayul = nayul
 		self.nayul.tree.on_error = self.on_app_command_error
 		
-	async def on_app_command_error(self, inter: discord.Interaction[NayulCore], error: Exception): #Função que trata erros nos comandos slash.
+	async def on_app_command_error(self, inter: discord.Interaction[NayulCore], error: Exception):
+		"""Função que trata os erros dos comandos do bot"""
 		_P = Permissions()
 		
 		if inter.command is not None: #Verifica se o comando existe (para não dar erro 404)
@@ -55,9 +58,9 @@ class GlobalErrorHandler(commands.Cog):
 		
 		else: #Caso o erro não tenha um tratamento.
 			message = (
-				f"{Emoji.error} Ocorreu um erro inesperado ao executar.\n"
-        		f"-# Se o problema persistir, reporte ao desenvolvedor.\n"
-        		f"```{error}```"
+				f'{Emoji.error} Ocorreu um erro inesperado ao executar.\n'
+        		f'-# Se o problema persistir, reporte ao desenvolvedor.\n'
+        		f'```{error}```'
 			)
 			log.exception('Erro no comando:', exc_info=error)
 			
@@ -72,6 +75,19 @@ class GlobalErrorHandler(commands.Cog):
 		if isinstance(error, commands.NotOwner):
 			log.info(f'{ctx.author.name} ({ctx.author.id}) tentou usar um comando de desenvolvedor.')
 			return
+		
+		if isinstance(error, commands.MissingRequiredArgument):
+			message = (
+				f'{Emoji.error} Nescessário argumento obrigatório `{error.param.name}`'
+			)
+
+		else:
+			message = (
+				f'{Emoji.error} Ocorreu um erro inesperado ao executar `{ctx.command.qualified_name}`'
+				f'````{error}```'
+			)
+			log.exception('Erro no comando:', exc_info=error)
+			await ctx.reply(message, delete_after=20)
 		
 async def setup(nayul: NayulCore):
 	await nayul.add_cog(GlobalErrorHandler(nayul))
