@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 from database.models.user import UserData
 
-class MongoUserDB:
+class UsersDB:
     def __init__(self, client: AsyncIOMotorClient):
         self.collection = client['global']['users']
 

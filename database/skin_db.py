@@ -3,7 +3,7 @@ from typing import Optional, Literal
 
 from database.models.skin import ProfileSkin
 
-class SkinDB:
+class SkinsDB:
     def __init__(self, client: AsyncIOMotorClient):
         self.collection = client['nayul']['skins']
 
