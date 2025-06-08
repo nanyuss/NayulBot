@@ -10,6 +10,7 @@ class OwnerCommands(commands.Cog):
     @commands.command(name='sync', description='Sincroniza os comandos da nayul.')
     @commands.is_owner()
     async def sync(self, ctx: commands.Context[NayulCore]):
+        """Sincroniza os comandos da Nayul com o Discord."""
         cmd = await self.nayul.tree.sync()
         await ctx.reply(f'Comandos sincronizados com sucesso. ({len(cmd)})', delete_after=10, mention_author=False)
 
