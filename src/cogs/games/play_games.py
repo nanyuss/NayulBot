@@ -47,7 +47,8 @@ class PlayGames(commands.Cog):
         """Inicia uma partida de Wordle."""
 
         word = random.choice(list(self.nayul.word_manager.five_letter_words)) # Pega uma palavra aleatória da lista de palavras
-        await inter.response.send_message(view=MainViewWordle(inter.user, word, []))
+        view = MainViewWordle(inter.user, word, [], inter=inter)
+        await inter.response.send_message(view=view)
 
 async def setup(nayul: NayulCore):
     await nayul.add_cog(PlayGames(nayul))

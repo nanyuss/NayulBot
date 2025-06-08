@@ -7,22 +7,24 @@ from .utils import format_wordle_url
 from src.utils.emojis import Emoji
 
 class MainView(ui.LayoutView):
-    def __init__(self, author: discord.User, word: str, guessed_words: List[Optional[str]] = []):
-        super().__init__(timeout=300)
+    def __init__(self, author: discord.User, word: str, guessed_words: List[Optional[str]] = [], **kwargs):
+        """View principal do jogo Wordle."""
+        super().__init__(timeout=30)
+        self.kwargs = kwargs # Armazena os argumentos adicionais
         self.author = author # Usuário que usou o comando
         self.word = word # Palavra que o usuário tem que adivinhar
         self.guessed_words = guessed_words # Lista das tentativas do usuário.
         self.container = Container(self, word, guessed_words) 
         self.add_item(self.container) # Adicionando o container ao layout
 
-    async def disable_all_items(self, edit_type: Literal['winner', 'loser']):
+    async def disable_all_items(self, edit_type: Literal['winner', 'loser', 'timeout']):
         """Desativa todos os botões da view.
 
         Args:
-            edit_type (`Literal['winner', 'loser']`): Tipo de edição que será feita.
+            edit_type (`Literal['winner', 'loser', 'timeout']`): Tipo de edição que será feita.
         """
 
-        #Desativa todos os botões no container e edita caso o usuário tenha ganhado ou perdido
+        #Desativa todos os botões no container e edita caso o usuário tenha ganhado, perdido ou o tempo tenha expirado.
         for item in self.container.children:
             if isinstance(item, ui.ActionRow):
                 for subitem in item.children:
@@ -38,12 +40,20 @@ class MainView(ui.LayoutView):
                                 subitem.disabled = True
                                 subitem.emoji = Emoji.error
                                 subitem.label = 'Você perdeu!'
+                            case 'timeout':
+                                subitem.disabled = True
 
     async def update_container(self):
         """Atualiza o container da view."""
         self.clear_items()
         self.container = Container(self, self.word, self.guessed_words)
         self.add_item(self.container)
+
+    async def on_timeout(self):
+        """Método chamado quando o tempo da view expira."""
+        await self.disable_all_items('timeout')
+        inter: discord.Interaction = self.kwargs.get('inter')
+        await inter.edit_original_response(view=self)
 
 class Container(ui.Container):
     def __init__(self, view: 'MainView', word: str, guessed_words: List[Optional[str]] = []):
