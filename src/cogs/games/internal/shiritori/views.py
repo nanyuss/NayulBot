@@ -3,10 +3,10 @@ from discord import ui
 
 from typing import TYPE_CHECKING, Dict
 
-from nayul import NayulCore
+from src import NayulCore
 from .utils import configure_player_button
 from .types import PlayerStats
-from nayul.utils.emojis import Emoji
+from src.utils.emojis import Emoji
 
 if TYPE_CHECKING:
     from .components import MainView
@@ -27,7 +27,7 @@ class ConfirmPlayer(ui.Button):
         # Garante que apenas o jogador correto pode confirmar
         if inter.user.id != self.player_id:
             return await inter.response.send_message(
-                f'❌ Apenas <@{self.player_id}> pode confirmar esta participação na partida.',
+                f'{Emoji.error} Apenas <@{self.player_id}> pode confirmar esta participação na partida.',
                 ephemeral=True
             )
         
@@ -59,7 +59,7 @@ class ConfirmStartGame(ui.Button):
     async def callback(self, inter: discord.Interaction[NayulCore]):
         # Garante que apenas o autor pode iniciar a partida
         if inter.user != self.view_instance.author:
-            return await inter.response.send_message(f'❌ Apenas {self.view_instance.author.mention} (criador da partida) pode iniciar o jogo.'
+            return await inter.response.send_message(f'{Emoji.error} Apenas {self.view_instance.author.mention} (criador da partida) pode iniciar o jogo.'
 , ephemeral=True)
         # Somente pode iniciar se 2 jogadores ou mais estiverem confirmado
         elif len(self.view_instance.confirmed_players) < 2:
@@ -149,7 +149,7 @@ class PlayerStatusSelect(ui.Select):
         player_id = int(self.values[0])
         s = self.players_stats.get(player_id)
         if not s:
-            return await inter.response.send_message('❌ Nenhum dado encontrado para este jogador.', ephemeral=True)
+            return await inter.response.send_message(f'{Emoji.error} Nenhum dado encontrado para este jogador.', ephemeral=True)
         words = s.get('words_list', [])
         long = max(words, key=len) if words else '-'
         short = min(words, key=len) if words else '-'

@@ -2,7 +2,7 @@ import logging
 from typing import TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
-    from nayul import NayulCore
+    from src import NayulCore
 
 from env import ENV
 
@@ -13,6 +13,7 @@ class WordManager:
 
     def __init__(self):
         self.words_list: Set[str] = set()
+        self.five_letter_words: Set[str] = set()
 
     async def load_words(self, nayul: 'NayulCore'):
         """Carrega as palavras do shiritori do bot.
@@ -31,4 +32,7 @@ class WordManager:
                 word = line.strip()
                 if word:
                     self.words_list.add(word)
+                    if len(word) == 5:
+                        self.five_letter_words.add(word)
+
         log.info('😄 Lista de palavras carregadas com sucesso.')

@@ -6,9 +6,9 @@ import logging
 import asyncio
 from typing import Set
 
-from nayul import NayulCore
-from nayul.utils.emojis import Emoji
-from nayul.utils.others import format_api_url
+from src import NayulCore
+from src.utils.emojis import Emoji
+from src.utils.others import format_api_url
 from .utils import configure_player_button
 from .gameflow import start_game_shiritori
 from .views import ConfirmPlayer, SelectPlayers, ConfirmStartGame

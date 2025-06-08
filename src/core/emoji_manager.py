@@ -5,10 +5,10 @@ import logging
 from typing import TYPE_CHECKING, Dict
 
 if TYPE_CHECKING:
-    from nayul import NayulCore
+    from src import NayulCore
 
 from env import ENV
-from nayul.utils.emojis import Emoji
+from src.utils.emojis import Emoji
 
 
 log = logging.getLogger(__name__)

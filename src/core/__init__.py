@@ -12,6 +12,7 @@ from env import ENV
 from .emoji_manager import EmojiManager
 from .word_manager import WordManager
 from .cog_manager import CogManager
+from .restrict_help import RestrictedHelpCommand
 from database import DatabaseClient
 
 log = logging.getLogger(__name__)
@@ -30,15 +31,14 @@ class NayulCore(commands.AutoShardedBot):
     Esta classe é responsável por inicializar o bot, carregar as extensões e gerenciar os eventos.
     """
     def __init__(self):
-        intents = discord.Intents.default()
+        intents = discord.Intents.all()
         intents.message_content = True  # Necessário para ler o conteúdo das mensagens
         intents.members = True # Necessário para acessar informações dos membros
         super().__init__(
             command_prefix=commands.when_mentioned_or(ENV.PREFIX),
             intents=intents,
-            help_command=None,
+            help_command=RestrictedHelpCommand(),
         )
-
         #------- atributos do bot -------#
         self.owner_ids = set()
         self.uptime = time()
@@ -62,12 +62,12 @@ class NayulCore(commands.AutoShardedBot):
             try:
                 self.db = await DatabaseClient.connect()
             except Exception:
-                self.close()
+                await self.close()
 
             await self.word_manager.load_words(self)
             await self.emoji_manager.config_emojis(self)
             await self.cog_manager.load_cogs(self)
-            await self.load_extension('jishaku') 
+            await self.load_extension('jishaku')
 
     async def on_ready(self):
             """Método chamado quando o bot está pronto."""

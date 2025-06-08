@@ -13,5 +13,5 @@ def format_api_url(endpoint: str) -> str:
 
 def Permissions() -> dict:
 	"""Carrega as permissões em Português do arquivo permissions.yml."""
-	with open('./nayul/utils/resources/permissions.yml', 'r', encoding='utf-8') as file:
+	with open('./src/utils/resources/permissions.yml', 'r', encoding='utf-8') as file:
 		return yaml.safe_load(file) or {}

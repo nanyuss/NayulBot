@@ -62,10 +62,7 @@ class Emoji:
 
     @classmethod
     def update(cls, **kwargs):
-        """Atualiza os emojis dinamicamente.
-        Args:
-            kwargs (`dict`): Dicionário de emojis.
-        """
+        """Atualiza os emojis dinamicamente."""
         for key, value in kwargs.items():
             setattr(cls, key, value)
 

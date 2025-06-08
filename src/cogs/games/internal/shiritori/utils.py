@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING, List, Dict, Literal, Any
 from datetime import datetime
 
 import re
-from nayul.utils.emojis import Emoji
+from src.utils.emojis import Emoji
 from .types import PlayerStats
-from nayul import NayulCore
+from src import NayulCore
 
 if TYPE_CHECKING:
     from .views import ConfirmPlayer
