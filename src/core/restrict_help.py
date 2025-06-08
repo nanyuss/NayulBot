@@ -27,16 +27,16 @@ class RestrictedHelpCommand(HelpCommand):
                     subcommands = await self.filter_commands(command.commands, sort=True)
                     if subcommands:
                         sub_list = '\n'.join(
-                            f'  ↳ `{self.context.prefix}{command.name} {sub.name}` - {sub.help or "Sem descrição"}'
+                            f'  ↳ `{self.context.prefix}{command.name} {sub.name}` - {sub.description or "Sem descrição"}'
                             for sub in subcommands
                         )
                         value_lines.append(
-                            f'`{self.context.prefix}{command.name}` - {command.help or "Sem descrição"}\n{sub_list}\n\n'
+                            f'`{self.context.prefix}{command.name}` - {command.description or "Sem descrição"}\n{sub_list}\n\n'
                         )
                     else:
-                        value_lines.append(f'`{self.context.prefix}{command.name}` - {command.help or "Sem descrição"}\n')
+                        value_lines.append(f'`{self.context.prefix}{command.name}` - {command.description or "Sem descrição"}\n')
                 else:
-                    value_lines.append(f'`{self.context.prefix}{command.name}` - {command.help or "Sem descrição"}\n')
+                    value_lines.append(f'`{self.context.prefix}{command.name}` - {command.description or "Sem descrição"}\n')
 
             cog_name = cog.qualified_name if cog else 'Sem categoria'
             embed.add_field(name=cog_name, value=''.join(value_lines), inline=False)
