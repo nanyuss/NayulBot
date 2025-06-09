@@ -26,7 +26,7 @@ class ResponseModal(ui.Modal):
         word = self.guess.value.lower() # Pega a resposta do modal e deixa em minúscula
 
         # Verifica se a resposta não é somente palavras ou se a palavra está na lista
-        if not word.isalpha() or word not in inter.client.word_manager.five_letter_words:
+        if (not word.isalpha()) or (word not in inter.client.word_manager.five_letter_words) or (word not in inter.client.word_manager.words_list):
             await inter.response.send_message(f'{Emoji.error} A palavra fornecida não é válida ou não está na lista de palavras permitidas.', ephemeral=True)
             return
         

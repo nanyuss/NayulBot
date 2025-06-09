@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from typing import TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
@@ -22,17 +23,26 @@ class WordManager:
         """
 
         log.warning('Iniciando configuração das palavras...')
-        async with nayul.session.get(f'{ENV.INTERNAL_API}/words/pt.txt') as response:
+        all_words, wordle_words = await asyncio.gather(
+            self.fetch_words(nayul, 'words/all/pt.txt'),
+            self.fetch_words(nayul, 'words/wordle/pt.txt')
+        )
+
+        # Atribui os resultados às variáveis da instância
+        self.words_list = all_words or set()
+        self.five_letter_words = wordle_words or set()
+        log.info('😄 Lista de palavras carregadas com sucesso.')
+
+    async def fetch_words(self, nayul: 'NayulCore', endpoint: str) -> Set[str]:
+        """Busca as palavras do shiritori do bot.
+        Args:
+            nayul (`NayulCore`): Instância do bot.
+            endpoint (str): Endpoint da API para buscar as palavras.
+        """
+        async with nayul.session.get(f'{ENV.INTERNAL_API}/{endpoint}') as response:
             if response.status != 200:
-                log.critical(f'Erro ao acessar a URL: {response.status}')
+                log.critical(f'Erro ao acessar a URL: {response.status} {response.url}')
                 return
                 
             text = await response.text()
-            for line in text.splitlines():
-                word = line.strip()
-                if word:
-                    self.words_list.add(word)
-                    if len(word) == 5:
-                        self.five_letter_words.add(word)
-
-        log.info('😄 Lista de palavras carregadas com sucesso.')
+            return {line.strip() for line in text.splitlines() if line.strip()}
