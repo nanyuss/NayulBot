@@ -7,3 +7,4 @@ pydantic
 psutil
 unidecode
 motor
+tzdata

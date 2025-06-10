@@ -6,6 +6,7 @@ import random
 from typing import Set
 
 from src import NayulCore
+from src.utils import nayul_decorators
 from .internal.shiritori import MainView as MainViewShiritori
 from .internal.wordle import MainView as MainViewWordle
 
@@ -26,6 +27,7 @@ class PlayGames(commands.Cog):
         read_messages=True,
         add_reactions=True
     )
+    @nayul_decorators.check_user_banned()
     async def shiritori(self, inter: discord.Interaction[NayulCore]):
         """Inicia uma partida de Shiritori."""
         players: Set[discord.Member] = [inter.user]
@@ -43,11 +45,13 @@ class PlayGames(commands.Cog):
     @play.command(name='termo', description='Descubra a palavra secreta em até 6 tentativas no jogo Wordle.')
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @app_commands.allowed_installs(guilds=True, users=True)
+    @nayul_decorators.check_user_banned()
     async def wordle(self, inter: discord.Interaction[NayulCore]):
         """Inicia uma partida de Wordle."""
 
         word = random.choice(list(self.nayul.word_manager.five_letter_words)) # Pega uma palavra aleatória da lista de palavras
-        await inter.response.send_message(view=MainViewWordle(inter.user, word, []))
+        view = MainViewWordle(inter.user, word, [], inter=inter)
+        await inter.response.send_message(view=view)
 
 async def setup(nayul: NayulCore):
     await nayul.add_cog(PlayGames(nayul))

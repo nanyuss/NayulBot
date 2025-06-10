@@ -7,6 +7,7 @@ from src import NayulCore
 from .utils import configure_player_button
 from .types import PlayerStats
 from src.utils.emojis import Emoji
+from src.utils import nayul_decorators
 
 if TYPE_CHECKING:
     from .components import MainView
@@ -22,7 +23,7 @@ class ConfirmPlayer(ui.Button):
         self.view_instance = view
         self.player_id = player_id
     
-
+    @nayul_decorators.check_user_banned()
     async def callback(self, inter: discord.Interaction[NayulCore]):
         # Garante que apenas o jogador correto pode confirmar
         if inter.user.id != self.player_id:
@@ -55,7 +56,8 @@ class ConfirmStartGame(ui.Button):
     def __init__(self, view: 'MainView'):
         super().__init__(style=discord.ButtonStyle.blurple, label='Iniciar Partida')
         self.view_instance = view
-
+    
+    @nayul_decorators.check_user_banned()
     async def callback(self, inter: discord.Interaction[NayulCore]):
         # Garante que apenas o autor pode iniciar a partida
         if inter.user != self.view_instance.author:
@@ -83,6 +85,7 @@ class SelectPlayers(ui.UserSelect):
         super().__init__(placeholder='Selecione ou remova jogadores aqui…', max_values=25)
         self.view_instance = view
 
+    @nayul_decorators.check_user_banned()
     async def callback(self, inter: discord.Interaction[NayulCore]):
         # Garante que apenas o autor pode gerenciar os jogadores
         if self.view_instance.author != inter.user:
@@ -145,6 +148,7 @@ class PlayerStatusSelect(ui.Select):
         super().__init__(placeholder='Veja a estatística de um jogador...', options=options)
         self.players_stats = players_stats
 
+    @nayul_decorators.check_user_banned()
     async def callback(self, inter: discord.Interaction[NayulCore]):
         player_id = int(self.values[0])
         s = self.players_stats.get(player_id)
