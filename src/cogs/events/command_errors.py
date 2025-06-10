@@ -83,7 +83,7 @@ class GlobalErrorHandler(commands.Cog):
 
 		else:
 			message = (
-				f'{Emoji.error} Ocorreu um erro inesperado ao executar `{ctx.command.qualified_name}`'
+				f'{Emoji.error} Ocorreu um erro inesperado ao executar `o comando'
 				f'````{error}```'
 			)
 			log.exception('Erro no comando:', exc_info=error)

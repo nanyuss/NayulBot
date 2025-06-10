@@ -1,5 +1,4 @@
 import logging
-import asyncio
 from typing import TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
@@ -23,10 +22,9 @@ class WordManager:
         """
 
         log.warning('Iniciando configuração das palavras...')
-        all_words, wordle_words = await asyncio.gather(
-            self.fetch_words(nayul, 'words/all/pt.txt'),
-            self.fetch_words(nayul, 'words/wordle/pt.txt')
-        )
+
+        wordle_words = await self.fetch_words(nayul, 'words/wordle/pt.txt') or set()
+        all_words = await self.fetch_words(nayul, 'words/all/pt.txt') or set()
 
         # Atribui os resultados às variáveis da instância
         self.words_list = all_words or set()
