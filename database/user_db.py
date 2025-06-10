@@ -80,7 +80,7 @@ class UsersDB:
         user_dict['ban']['banned'] = banned
         user_dict['ban']['bannedBy'] = banned_by
         user_dict['ban']['bannedAt'] = None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
-        user_dict['ban']['expiresAt'] = expired_in.isoformat()
+        user_dict['ban']['expiresAt'] = expired_in.isoformat() if expired_in else None
         user_dict['ban']['reason'] = reason
 
         await self.update_user(user, query={'$set': user_dict})
