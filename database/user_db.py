@@ -1,10 +1,13 @@
 import discord
+import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional, Union, Literal
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from database.models.user import UserData
+
+log = logging.getLogger(__name__)
 
 class UsersDB:
     def __init__(self, client: AsyncIOMotorClient):
@@ -18,8 +21,9 @@ class UsersDB:
             user (`Union[discord.Member, discord.User]`): O usuário para criar a conta.
         """
         await self.collection.insert_one(
-            UserData(id=user.id).model_dump(by_alias=True)
+            UserData(id=user.id, acceptedTerms=True).model_dump(by_alias=True)
         )
+        log.debug('Conta de usuário criada para o usuário: %s', user.id)
 
     #---------- Get info ----------#
 
@@ -35,8 +39,11 @@ class UsersDB:
         """
         data: Optional[dict] = await self.collection.find_one({'_id': user.id})
         if data is None:
+            log.debug('Usuário não encontrado no banco de dados: %s', user.id)
+            # Se o usuário não existir, cria uma conta padrão
             return UserData(id=user.id)
 
+        log.debug('Usuário encontrado no banco de dados: %s', data)
         return UserData(**data)
     
     #---------- Delete Info ----------#
@@ -49,6 +56,7 @@ class UsersDB:
             user (`Union[discord.Member, discord.User]`): O usuário a ser excluído.
         """
         await self.collection.delete_one({'_id': user.id})
+        log.debug('Usuário excluído do banco de dados: %s', user.id)
     
     #---------- Update info ----------#
     
@@ -61,6 +69,7 @@ class UsersDB:
             query (`dict`): Os dados a serem atualizados.
         """
         await self.collection.update_one({'_id': user.id}, query)
+        log.debug('Usuário %s atualizado com os dados: %s', user.id, query)
 
     async def update_ban(self, user: Union[discord.Member, discord.User], banned: bool, banned_by: Optional[int] = None, expired_in: Optional[datetime] = None, reason: Optional[str] = None) -> None:
         """
@@ -84,6 +93,7 @@ class UsersDB:
         user_dict['ban']['reason'] = reason
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Banimento atualizado para o usuário %s: %s', user.id, user_dict['ban'])
 
     async def update_skin(self, user: Union[discord.Member, discord.User], action: Literal['add', 'remove'], skin: str) -> None:
         """
@@ -110,6 +120,7 @@ class UsersDB:
 
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Skin %s %s para o usuário %s', action, skin, user.id)
 
     async def update_about_me(self, user: Union[discord.Member, discord.User], about_me: str) -> None:
         """
@@ -126,6 +137,7 @@ class UsersDB:
         user_dict['profile']['aboutMe'] = about_me
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Descrição pessoal atualizada para o usuário %s: %s', user.id, about_me)
 
     async def update_pearls(self, user: Union[discord.Member, discord.User], action: Literal['add', 'remove', 'set'], pearls: int) -> None:
         """
@@ -149,6 +161,7 @@ class UsersDB:
                 user_dict['pearls'] = pearls
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Perólas atualizadas para o usuário %s: %s', user.id, user_dict['pearls'])
 
     async def update_experience(self, user: Union[discord.Member, discord.User], action: Literal['add', 'remove'], experience: float) -> None:
         """
@@ -170,6 +183,7 @@ class UsersDB:
                 user_dict['experience'] -= experience
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Experiência atualizada para o usuário %s: %s', user.id, user_dict['experience'])
 
     async def update_reputation(self, user: Union[discord.Member, discord.User], action: Literal['add', 'remove'], reputation: int) -> None:
         """
@@ -191,6 +205,7 @@ class UsersDB:
                 user_dict['reputation'] -= reputation
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Reputação atualizada para o usuário %s: %s', user.id, user_dict['reputation'])
 
     async def update_cai_uuid(self, user: Union[discord.Member, discord.User], cai_uuid: str) -> None:
         """
@@ -207,6 +222,7 @@ class UsersDB:
         user_dict['caiUUID'] = cai_uuid
 
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('caiUUID atualizado para o usuário %s: %s', user.id, cai_uuid)
 
     async def update_married(self,
                     user: Union[discord.Member, discord.User],
@@ -240,6 +256,7 @@ class UsersDB:
             married_with_dict['married']['divisionOfAssets'] = division_of_assets
 
             await self.update_shared_pearls(user, married_with)
+            log.debug('Casamento atualizado para os usuários %s e %s: %s', user.id, married_with.id, user_dict['married'])
 
         else:
             user_dict['married']['married'] = married
@@ -251,10 +268,10 @@ class UsersDB:
             married_with_dict['married']['marriedWith'] = None
             married_with_dict['married']['since'] = married
             married_with_dict['married']['divisionOfAssets'] = None
+            log.debug('Divórcio atualizado para os usuários %s e %s: %s', user.id, married_with.id, user_dict['married'])
 
         await self.update_user(user, query={'$set': user_dict})
         await self.update_user(married_with, query={'$set': married_with_dict})
-
 
     async def update_shared_pearls(self, user1: Union[discord.Member, discord.User], user2: Union[discord.Member, discord.User], division: bool = False) -> None:
         """
@@ -284,6 +301,7 @@ class UsersDB:
 
         await self.update_user(user1, query={'$set': user1_dict})
         await self.update_user(user2, query={'$set': user2_dict})
+        log.debug('Perólas compartilhadas atualizadas para os usuários %s e %s: %s', user1.id, user2.id, total_shared_pearls)
 
     async def update_cooldowns(self, user: Union[discord.Member, discord.User],
                         cooldown: Literal['daily', 'reputation', 'married', 'premium_expiration'],
@@ -300,6 +318,7 @@ class UsersDB:
         user_dict = user_data.model_dump(by_alias=True)
         user_dict['cooldowns'][cooldown] = datetime_now.isoformat()
         await self.update_user(user, query={'$set': user_dict})
+        log.debug('Cooldown %s atualizado para o usuário %s: %s', cooldown, user.id, datetime_now.isoformat())
 
     #---------- Get all infos ----------#
 
@@ -313,6 +332,8 @@ class UsersDB:
         users = []
         async for user in self.collection.find():
             users.append(UserData(**user))
+        
+        log.debug('Total de usuários encontrados: %d', len(users))
         return users
     
     async def get_all_users_banned(self) -> list[UserData]:
@@ -325,4 +346,6 @@ class UsersDB:
         users = []
         async for user in self.collection.find({'ban.banned': True}):
             users.append(UserData(**user))
+        
+        log.debug('Total de usuários banidos encontrados: %d', len(users))
         return users

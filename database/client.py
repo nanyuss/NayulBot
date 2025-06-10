@@ -33,6 +33,7 @@ class DatabaseClient:
                 skins=SkinsDB(client),
                 settings=SettingsDB(client)
             )
+            log.debug('Conectado ao MongoDB com sucesso.')
         except Exception:
             log.critical('Não foi possível conectar ao MongoDB.', exc_info=True)
             raise ConnectionError('Não foi possível conectar ao MongoDB.')

@@ -76,18 +76,17 @@ class GlobalErrorHandler(commands.Cog):
 			log.info(f'{ctx.author.name} ({ctx.author.id}) tentou usar um comando de desenvolvedor.')
 			return
 		
+		if isinstance(error, commands.CommandNotFound):
+			log.info(f'Comando não encontrado: {ctx.message.content}')
+			return
+		
 		if isinstance(error, commands.MissingRequiredArgument):
 			message = (
 				f'{Emoji.error} Nescessário argumento obrigatório `{error.param.name}`'
 			)
 
-		else:
-			message = (
-				f'{Emoji.error} Ocorreu um erro inesperado ao executar `o comando'
-				f'````{error}```'
-			)
-			log.exception('Erro no comando:', exc_info=error)
-			await ctx.reply(message, delete_after=20)
+		log.exception('Erro no comando:', exc_info=error)
+		await ctx.reply(message, delete_after=20)
 		
 async def setup(nayul: NayulCore):
 	await nayul.add_cog(GlobalErrorHandler(nayul))

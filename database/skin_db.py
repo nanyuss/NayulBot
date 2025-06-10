@@ -1,7 +1,10 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional, Literal
+import logging
 
 from database.models.skin import ProfileSkin
+
+log = logging.getLogger(__name__)
 
 class SkinsDB:
     def __init__(self, client: AsyncIOMotorClient):
@@ -16,7 +19,9 @@ class SkinsDB:
         """
         data: Optional[list[dict]] = await self.collection.find().to_list(length=None)
         if data is None:
+            log.debug('Nenhuma skin encontrada no banco de dados.')
             return []
+        log.debug('Skins encontradas: %s', data)
         return [ProfileSkin(**skin) for skin in data]
     
     async def get_skin(self, skin_id: str) -> Optional[ProfileSkin]:
@@ -31,7 +36,9 @@ class SkinsDB:
         """
         data: Optional[dict] = await self.collection.find_one({'_id': skin_id})
         if data is None:
+            log.debug('Skin não encontrada com o ID: %s', skin_id)
             return None
+        log.debug('Skin encontrada: %s', data)
         return ProfileSkin(**data)
     
     async def remove_skin(self, skin_id: str) -> None:
@@ -42,6 +49,7 @@ class SkinsDB:
             skin_id (`str`): O ID da skin a ser removida.
         """
         await self.collection.delete_one({'_id': skin_id})
+        log.debug('Skin removida com o ID: %s', skin_id)
 
     async def add_skin(self, skin_id: str, name: str, rarity: Literal[0, 1, 2, 3, 4], price: int, description: str, url: str) -> None:
         """
@@ -56,6 +64,7 @@ class SkinsDB:
             url (`str`): URL da imagem da skin.
         """
         await self.collection.insert_one({'_id': skin_id, 'name': name, 'price': price, 'rarity': rarity, 'description': description, 'url': url})
+        log.debug('Skin %s adicionada com os dados: %s', skin_id, {'name': name, 'price': price, 'rarity': rarity, 'description': description, 'url': url})
 
     async def update_skin(self, skin_id: str, *, name: Optional[str] = None, rarity: Optional[Literal[0, 1, 2, 3, 4]] = None, price: Optional[int] = None, description: Optional[str] = None, url: Optional[str] = None) -> None:
         """
@@ -89,3 +98,4 @@ class SkinsDB:
             raise ValueError('Skin não encontrada com o ID fornecido.')
 
         await self.collection.update_one({'_id': skin_id}, {'$set': update_data})
+        log.debug('Skin %s atualizada com os dados: %s', skin_id, update_data)
