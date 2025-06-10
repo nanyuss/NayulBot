@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 from src import NayulCore
 from src.utils.emojis import Emoji
+from src.utils import nayul_decorators
 
 class ResponseModal(ui.Modal):
     def __init__(self, view: 'MainView'):
@@ -21,7 +22,7 @@ class ResponseModal(ui.Modal):
             required=True
         )
         self.add_item(self.guess)
-
+    
     async def on_submit(self, inter: discord.Interaction[NayulCore]):
         word = self.guess.value.lower() # Pega a resposta do modal e deixa em minúscula
 
@@ -51,7 +52,8 @@ class GuessButton(ui.Button):
     def __init__(self, view: 'MainView'):
         super().__init__(label='Adivinhar', emoji=Emoji.icon_edit, style=discord.ButtonStyle.secondary)
         self.view_instance = view
-
+    
+    @nayul_decorators.check_user_banned()
     async def callback(self, inter: discord.Interaction[NayulCore]):
         if inter.user != self.view_instance.author: # Verifica se a pessoa que clicou no botão é a mesma que usou o comando
             await inter.response.send_message(f'{Emoji.error} Apenas {self.view_instance.author.mention} pode interagir com este botão.', ephemeral=True)

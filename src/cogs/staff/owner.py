@@ -101,6 +101,5 @@ class OwnerCommands(commands.Cog):
         extensions = self.nayul.cog_manager.extensions.keys()
         await ctx.reply(f'Extensões:``` - all (Aplica em todas as extensões)\n - {"\n - ".join(extensions)}```', delete_after=120, mention_author=False)
 
-
 async def setup(nayul: NayulCore):
     await nayul.add_cog(OwnerCommands(nayul))

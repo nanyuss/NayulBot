@@ -36,6 +36,7 @@ class UsersDB:
         data: Optional[dict] = await self.collection.find_one({'_id': user.id})
         if data is None:
             return UserData(id=user.id)
+
         return UserData(**data)
     
     #---------- Delete Info ----------#
@@ -72,13 +73,14 @@ class UsersDB:
             expired_in (`Optional[datetime]`): Data de expiração do banimento.
             reason (`Optional[str]`): Motivo do banimento.
         """
+        
         user_data = await self.get_user(user)
         user_dict = user_data.model_dump(by_alias=True)
 
         user_dict['ban']['banned'] = banned
         user_dict['ban']['bannedBy'] = banned_by
-        user_dict['ban']['bannedAt'] = None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo'))
-        user_dict['ban']['expiresAt'] = expired_in
+        user_dict['ban']['bannedAt'] = None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
+        user_dict['ban']['expiresAt'] = expired_in.isoformat()
         user_dict['ban']['reason'] = reason
 
         await self.update_user(user, query={'$set': user_dict})
@@ -209,7 +211,7 @@ class UsersDB:
     async def update_married(self,
                     user: Union[discord.Member, discord.User],
                     married_with: Union[discord.Member, discord.User],
-                    married: bool, division_of_assets: Optional[bool] = None, since: Optional[datetime] = None) -> None:
+                    married: bool, division_of_assets: Optional[bool] = None) -> None:
         """
         Atualiza o status de casamento de um usuário no banco de dados.
 
@@ -229,12 +231,12 @@ class UsersDB:
         if married:
             user_dict['married']['married'] = married
             user_dict['married']['marriedWith'] = married_with.id
-            user_dict['married']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo'))
+            user_dict['married']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
             user_dict['married']['divisionOfAssets'] = division_of_assets
 
             married_with_dict['married']['married'] = married
             married_with_dict['married']['marriedWith'] = user.id
-            married_with_dict['married']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo'))
+            married_with_dict['married']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
             married_with_dict['married']['divisionOfAssets'] = division_of_assets
 
             await self.update_shared_pearls(user, married_with)
@@ -292,9 +294,35 @@ class UsersDB:
         Args:
             user (`Union[discord.Member, discord.User]`): O usuário para atualizar os cooldowns.
             cooldown (`Literal['daily', 'reputation', 'married', 'premium_expiration']`): O cooldown a ser atualizado.
-            timestamp (`datetime`): O novo timestamp do cooldown.
+            datetime_now (`datetime`): O novo timestamp do cooldown.
         """
         user_data = await self.get_user(user)
         user_dict = user_data.model_dump(by_alias=True)
-        user_dict['cooldowns'][cooldown] = datetime_now
+        user_dict['cooldowns'][cooldown] = datetime_now.isoformat()
         await self.update_user(user, query={'$set': user_dict})
+
+    #---------- Get all infos ----------#
+
+    async def get_all_users(self) -> list[UserData]:
+        """
+        Obtém todos os usuários do banco de dados.
+
+        Returns:
+            list[UserData]: Lista de todos os usuários.
+        """
+        users = []
+        async for user in self.collection.find():
+            users.append(UserData(**user))
+        return users
+    
+    async def get_all_users_banned(self) -> list[UserData]:
+        """
+        Obtém todos os usuários banidos do banco de dados.
+
+        Returns:
+            list[UserData]: Lista de todos os usuários banidos.
+        """
+        users = []
+        async for user in self.collection.find({'ban.banned': True}):
+            users.append(UserData(**user))
+        return users

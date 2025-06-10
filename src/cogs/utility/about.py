@@ -9,6 +9,7 @@ from datetime import timedelta
 
 import src
 from src import NayulCore
+from src.utils import nayul_decorators
 
 class AboutBot(commands.Cog):
     """Classe que contém os comandos de utilidade do bot."""
@@ -17,6 +18,7 @@ class AboutBot(commands.Cog):
         self.nayul = nayul
 
     @app_commands.command(name='ping', description='Mostra informações sobre a latência do bot.')
+    @nayul_decorators.check_user_banned()
     async def ping(self, inter: discord.Interaction[NayulCore]):
         """Comando que verifica a latência do bot."""
 
@@ -34,6 +36,7 @@ class AboutBot(commands.Cog):
                     )
 
     @app_commands.command(name='botinfo', description='Mostra informações sobre o bot.')
+    @nayul_decorators.check_user_banned()
     async def botinfo(self, inter: discord.Interaction[NayulCore]):
         """Comando que mostra informações sobre o bot."""
 

@@ -101,6 +101,7 @@ class UserData(BaseModel):
     pearls: int = 0
     experience: float = 0.0
     reputation: int = 0
+    accepted_terms: bool = Field(alias='acceptedTerms', default=False)
     cai_uuid: Optional[str] = Field(alias='caiUUID', default=None)
     profile: UserProfile = UserProfile()
     married: UserMarried = UserMarried()
