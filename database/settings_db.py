@@ -47,7 +47,7 @@ class SettingsDB:
             staff_id (`int`): O ID do staff a ser adicionado ou removido.
         """
         settings = await self.get_settings()
-        settings_dict = settings.model_dump(by_alias=True)
+        settings_dict = settings.to_dict()
 
         match action:
             case 'add':

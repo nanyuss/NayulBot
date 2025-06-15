@@ -1,8 +1,10 @@
-from pydantic import BaseModel
+from __future__ import annotations
 
 from typing import List
 
-class Settings(BaseModel):
+from ._base import BaseDataClass, Field
+
+class Settings(BaseDataClass):
     """
     Representa as configurações do bot.
 
@@ -10,7 +12,4 @@ class Settings(BaseModel):
         staffs (`List[int]`): Lista de IDs dos staffs do bot.
     """
     _id: int = 0
-    staffs: List[int] = []
-
-    class Config:
-        validate_by_name = True
+    staffs: List[int] = Field(default_factory=list)

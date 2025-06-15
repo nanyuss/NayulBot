@@ -51,7 +51,7 @@ class SkinsDB:
         await self.collection.delete_one({'_id': skin_id})
         log.debug('Skin removida com o ID: %s', skin_id)
 
-    async def add_skin(self, skin_id: str, name: str, rarity: Literal[0, 1, 2, 3, 4], price: int, description: str, url: str) -> None:
+    async def add_skin(self, skin_id: str, name: str, rarity: Literal[0, 1, 2, 3, 4], price: int, url: str, description: Optional[str] = None, author: Optional[str] = None) -> None:
         """
         Adiciona uma nova skin de perfil ao banco de dados.
 
@@ -61,12 +61,22 @@ class SkinsDB:
             price (`int`): Preço da skin em pérolas.
             rarity (`Literal[0, 1, 2, 3, 4]`): Raridade da skin.
             description (`Optional[str]`): Descrição da skin.
+            author (`Optional[str]`): Autor da skin.
             url (`str`): URL da imagem da skin.
         """
-        await self.collection.insert_one({'_id': skin_id, 'name': name, 'price': price, 'rarity': rarity, 'description': description, 'url': url})
-        log.debug('Skin %s adicionada com os dados: %s', skin_id, {'name': name, 'price': price, 'rarity': rarity, 'description': description, 'url': url})
+        skin_dict = ProfileSkin(
+            id=skin_id,
+            name=name,
+            price=price,
+            rarity=rarity,
+            description=description,
+            author=author,
+            url=url
+        ).to_dict()
+        await self.collection.insert_one(skin_dict)
+        log.debug('Skin %s adicionada com os dados: %s', skin_dict)
 
-    async def update_skin(self, skin_id: str, *, name: Optional[str] = None, rarity: Optional[Literal[0, 1, 2, 3, 4]] = None, price: Optional[int] = None, description: Optional[str] = None, url: Optional[str] = None) -> None:
+    async def update_skin(self, skin_id: str, *, name: Optional[str] = None, rarity: Optional[Literal[0, 1, 2, 3, 4]] = None, price: Optional[int] = None, description: Optional[str] = None, author: Optional[str] = None, url: Optional[str] = None,) -> None:
         """
         Atualiza uma skin de perfil no banco de dados.
 
@@ -83,19 +93,19 @@ class SkinsDB:
             ValueError: Se a skin não for encontrada com o ID fornecido.
         """
         
-        update_data = {k: v for k, v in {
-            'name': name,
-            'rarity': rarity,
-            'price': price,
-            'description': description,
-            'url': url
-        }.items() if v is not None}
-
-        if not update_data:
-            raise ValueError('Pelo menos um valor deve ser fornecido para atualização.')
-
-        if await self.get_skin(skin_id) is None:
+        skin_data = await self.get_skin(skin_id)
+        if skin_data is None:
             raise ValueError('Skin não encontrada com o ID fornecido.')
 
-        await self.collection.update_one({'_id': skin_id}, {'$set': update_data})
-        log.debug('Skin %s atualizada com os dados: %s', skin_id, update_data)
+        skin_dict = ProfileSkin(
+            id=skin_data.id,
+            name=name or skin_data.name,
+            price=price or skin_data.price,
+            rarity=rarity or skin_data.rarity,
+            description=description or skin_data.description,
+            author=author or skin_data.author,
+            url=url or skin_data.url
+        ).to_dict()
+
+        await self.collection.update_one({'_id': skin_id}, {'$set': skin_dict})
+        log.debug('Skin %s atualizada com os dados: %s', skin_dict)
