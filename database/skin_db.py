@@ -1,5 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 import logging
 
 from database.models.skin import ProfileSkin
@@ -109,3 +109,14 @@ class SkinsDB:
 
         await self.collection.update_one({'_id': skin_id}, {'$set': skin_dict})
         log.debug('Skin %s atualizada com os dados: %s', skin_dict)
+
+    async def get_all_skins(self) -> List[ProfileSkin]:
+        """Pega todas as skins do banco de dados.
+        Returns:
+            List[ProfileSkin]: Lista de todas as skins.
+        """
+
+        skins = []
+        async for skin in self.collection.find().to_list(length=None):
+            skins.append(ProfileSkin(**skin))
+        return skins
