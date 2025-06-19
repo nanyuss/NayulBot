@@ -88,7 +88,7 @@ class UserData(BaseDataClass):
     cai_uuid: Optional[str] = Field(alias='caiUUID', default=None)
     profile: Optional[Profile] = Field(default_factory=Profile)
     cooldowns: Optional[Cooldowns] = Field(default_factory=Cooldowns)
-    married_status: Optional[MarriedStatus] = Field(alias='marriedStatus')
+    married_status: Optional[MarriedStatus] = Field(alias='marriedStatus', default=None)
     ban_status: Optional[BanStatus] = Field(alias='banStatus', default=None)
 
     def __str__(self) -> str:
