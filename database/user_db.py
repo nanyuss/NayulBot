@@ -18,7 +18,7 @@ class UsersDB:
             user (`Union[discord.Member, discord.User]`): O usuário para criar a conta.
         """
         await self.collection.insert_one(
-            UserData(id=user.id).model_dump(by_alias=True)
+            UserData(id=user.id).to_dict()
         )
 
     #---------- Get info ----------#
