@@ -19,7 +19,7 @@ class SettingsDB:
         """
         data = await self.collection.find_one({'_id': 0})
         if data is None:
-            default_settings = Settings().model_dump(by_alias=True)
+            default_settings = Settings().to_dict()
             default_settings['_id'] = 0
             await self.collection.insert_one(default_settings)
             log.debug('Configurações padrão inseridas no banco de dados.')
