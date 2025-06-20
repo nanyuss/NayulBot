@@ -67,10 +67,13 @@ class HTTPClient(BaseHTTPClient):
         encoded_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
 
         return await self.request(
-            Router('PUT', '/repos/{owner}/{repo}/contents/{path}', owner=owner, repo=repo, path=path, sha=sha),
-            message=commit_message,
-            content=encoded_content,
-            branch=branch
+            Router('PUT', '/repos/{owner}/{repo}/contents/{_path}', owner=owner, repo=repo, _path=path),
+            json={
+                'message': commit_message,
+                'content': encoded_content,
+                'sha': sha,
+                'branch': branch
+            }
         )
 
     async def get_branches(self, owner: str, repo: str) -> list[dict]:

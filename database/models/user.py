@@ -57,12 +57,10 @@ class BanStatus(BaseDataClass):
     Attributes:
         banned_by (`int`): Id do usuário que baniu o usuário.
         banned_at (`datetime`): Data do banimento.
-        expires_at (`Optional[datetime]`): Data de expiração do banimento.
         reason (`str`): Motivo do banimento.
     """
     banned_by: int = Field(alias='bannedBy')
     banned_at: datetime = Field(alias='bannedAt')
-    expires_at: Optional[datetime] = Field(alias='expiresAt', default=None)
     reason: str = None
 
 class UserData(BaseDataClass):
@@ -74,6 +72,7 @@ class UserData(BaseDataClass):
         pearls (`int`): Quantidade de pérolas do usuário.
         experience (`float`): Experiência do usuário.
         reputation (`int`): Reputação do usuário.
+        accepted_terms (`bool`): Indica se os termos de uso foram aceitos.
         cai_uuid (`Optional[str]`): UUID do usuário.
         cooldowns (`Optional[Cooldowns]`): Cooldowns do usuário.
         married_status (`Optional[MarriedStatus]`): Informações de casamento do usuário.

@@ -43,8 +43,6 @@ class PlayGames(commands.Cog):
         await view.start_game_auto(inter)
 
     @play.command(name='termo', description='Descubra a palavra secreta em até 6 tentativas no jogo Wordle.')
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @app_commands.allowed_installs(guilds=True, users=True)
     @nayul_decorators.check_user_banned()
     async def wordle(self, inter: discord.Interaction[NayulCore]):
         """Inicia uma partida de Wordle."""

@@ -80,13 +80,9 @@ class GlobalErrorHandler(commands.Cog):
 			log.info(f'Comando não encontrado: {ctx.message.content}')
 			return
 		
-		if isinstance(error, commands.MissingRequiredArgument):
-			message = (
-				f'{Emoji.error} Nescessário argumento obrigatório `{error.param.name}`'
-			)
+		if isinstance(error, commands.CommandOnCooldown):
+			await ctx.reply(f'⏱️ Calma aí! Você só pode usar esse comando de novo em `{error.retry_after:.1f}` segundos.', delete_after=10)
 
 		log.exception('Erro no comando:', exc_info=error)
-		await ctx.reply(message, delete_after=20)
-		
 async def setup(nayul: NayulCore):
 	await nayul.add_cog(GlobalErrorHandler(nayul))

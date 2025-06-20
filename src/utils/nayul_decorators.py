@@ -4,7 +4,7 @@ from discord.ext import commands
 from typing import Union
 
 from src import NayulCore
-from .others import format_timestamp
+from .others import format_timestamp, Colors
 
 def is_staff():
     """Verifica se o usuário é um staff do bot."""
@@ -31,25 +31,21 @@ def check_user_banned():
             
             user_data = await nayul.db.users.get_user(user)
 
-            if user_data.ban.banned:
+            if user_data.ban_status:
                 if isinstance(inter, discord.Interaction):
-                    banned_at = user_data.ban.banned_at
-                    expires_at = user_data.ban.expires_at
-
-                    if expires_at:
-                        expires_str = f'{format_timestamp(expires_at, "F")} ({format_timestamp(expires_at, "R")})'
-                    else:
-                        expires_str = 'Nunca (Permanente)'
-
-                    message = (
-                        f'⚠️{inter.user.mention} está **banido de usar todas as funcionalidades** da {self.nayul.user.name}.\n'
-                        f'**Banido em:** {format_timestamp(banned_at, "F")} ({format_timestamp(banned_at, "R")})\n'
-                        f'**Expira em:** {expires_str}\n'
-                        f'**Motivo:** {user_data.ban.reason}\n'
-                        '-# Se você acredita que isso é um erro, entre em contato com a equipe do bot.'
-                    )
+                    banned_at = user_data.ban_status.banned_at
+                    embed = discord.Embed(
+                        title='Você está banido!',
+                        color=Colors.MYSTIC_PURPLE,
+                        description=(
+                            f'Olá {inter.user.mention}, sua conta foi **banida** e não poderá utilizar nenhuma funcionalidade da {self.nayul.user.name}.\n\n'
+                            f'**Banido em:** {format_timestamp(banned_at, "F")} ({format_timestamp(banned_at, "R")})\n'
+                            f'**Motivo:** {user_data.ban_status.reason}\n'
+                        )
+                    ).set_thumbnail(url=inter.user.display_avatar.url)
+                    embed.set_footer(text='Se você acredita que isso é um erro, entre em contato com a equipe do bot.')
                     await inter.response.send_message(
-                        content=message,
+                        embed=embed,
                         ephemeral=True,
                         allowed_mentions=discord.AllowedMentions.none()
                     )

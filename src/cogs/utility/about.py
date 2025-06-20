@@ -10,6 +10,7 @@ from datetime import timedelta
 import src
 from src import NayulCore
 from src.utils import nayul_decorators
+from src.utils.others import Colors
 
 class AboutBot(commands.Cog):
     """Classe que contém os comandos de utilidade do bot."""
@@ -40,7 +41,7 @@ class AboutBot(commands.Cog):
     async def botinfo(self, inter: discord.Interaction[NayulCore]):
         """Comando que mostra informações sobre o bot."""
 
-        embed = discord.Embed(title=f'Informações sobre {inter.client.user.name}', color=discord.Color.blurple())
+        embed = discord.Embed(title=f'Informações sobre {inter.client.user.name}', color=Colors.MYSTIC_PURPLE)
         embed.description = (
             f'```yaml\n'
             f'SO:               {platform.system()} {platform.release()}\n'
@@ -77,7 +78,7 @@ class AboutBot(commands.Cog):
             icon_url=owner.display_avatar.url
         )
 
-        await inter.response.send_message(embed=embed)
+        await inter.response.send_message(embed=embed, ephemeral=True)
 
 async def setup(nayul: NayulCore):
     await nayul.add_cog(AboutBot(nayul))

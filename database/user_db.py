@@ -61,7 +61,7 @@ class UsersDB:
         """
         await self.collection.update_one({'_id': user.id}, query)
 
-    async def update_ban(self, user: Union[discord.Member, discord.User], banned: bool, banned_by: Optional[int] = None, expired_in: Optional[datetime] = None, reason: Optional[str] = None) -> None:
+    async def update_ban(self, user: Union[discord.Member, discord.User], banned: bool, banned_by: Optional[int] = None, reason: Optional[str] = None) -> None:
         """
         Atualiza o status de banimento de um usuário no banco de dados.
 
@@ -69,17 +69,18 @@ class UsersDB:
             user (`Union[discord.Member, discord.User]`): O usuário para atualizar o status de banimento.
             banned (`bool`): Indica se o usuário está banido.
             banned_by (`Optional[int]`): ID do usuário que realizou o banimento.
-            expired_in (`Optional[datetime]`): Data de expiração do banimento.
             reason (`Optional[str]`): Motivo do banimento.
         """
         user_data = await self.get_user(user)
         user_dict = user_data.to_dict()
-
-        user_dict['banStatus']['banned'] = banned
-        user_dict['banStatus']['bannedBy'] = banned_by
-        user_dict['banStatus']['bannedAt'] = None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo'))
-        user_dict['banStatus']['expiresAt'] = expired_in
-        user_dict['banStatus']['reason'] = reason
+        if banned:
+            user_dict['banStatus'] = {
+                'bannedBy': banned_by,
+                'bannedAt': None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat(),
+                'reason': reason
+            }
+        else:
+            user_dict['banStatus'] = None
 
         await self.update_user(user, query={'$set': user_dict})
 
