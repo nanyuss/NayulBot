@@ -12,7 +12,7 @@ class ModCommands(commands.Cog):
     def __init__(self, nayul: NayulCore):
         self.nayul = nayul
 
-    @commands.command(name='nayulban', description='Banir um usuário do bot.')
+    @commands.command(name='nban', description='Banir um usuário do bot.')
     @nayul_decorators.is_staff()
     async def nayulban(self, ctx: commands.Context[NayulCore], user: discord.User, *, reason: str = 'Nenhum motivo fornecido'):
         """ Comando para banir um usuário do bot."""
@@ -33,37 +33,26 @@ class ModCommands(commands.Cog):
 
         user_data = await self.nayul.db.users.get_user(user)
         if not user_data.accepted_terms:
-            return await ctx.reply('O usuário não tem uma conta registrada.')
-        if user_data.ban.banned:
+            return await ctx.reply('O usuário não tem uma conta registrada.', delete_after=60)
+        if user_data.ban_status is not None:
             return await ctx.reply(f'O usuário {user.mention} já está banido.', allowed_mentions=discord.AllowedMentions.none())
 
-        await self.nayul.db.users.update_ban(user, True, ctx.author.id, None, reason)
-        await ctx.send(f'{ctx.author.mention} Usuário banido com sucesso!')
+        await self.nayul.db.users.update_ban(user, True, ctx.author.id, reason)
+        await ctx.send(f'{ctx.author.mention} **|** Usuário banido com sucesso!')
         log.info(f'Usuário {user.id} banido por {ctx.author.id} com motivo: {reason}')
 
-        try:
-            message = (
-                f'⚠️ Você foi **banido de usar todas as minhas funcionalidades**.\n'
-                f'**Expira em:** Nunca (Permanente)\n'
-                f'**Motivo:** {reason}\n'
-                '-# Se você acredita que isso é um erro, entre em contato com a equipe do bot.'
-            )
-            await user.send(message)
-        except discord.Forbidden:
-            log.warning(f'Não foi possível enviar mensagem privada para o usuário {user.id}.')
-
-    @commands.command(name='nayulunban', description='Desbanir um usuário do bot.')
+    @commands.command(name='nunban', description='Desbanir um usuário do bot.')
     @nayul_decorators.is_staff()
     async def nayulunban(self, ctx: commands.Context[NayulCore], user: discord.User):
         """ Comando para desbanir um usuário do bot."""
         user_data = await self.nayul.db.users.get_user(user)
         if not user_data.accepted_terms:
-            return await ctx.reply('O usuário não tem uma conta registrada.')
-        if not user_data.ban.banned:
-            return await ctx.reply(f'O usuário {user.mention} não está banido.', allowed_mentions=discord.AllowedMentions.none())
+            return await ctx.reply('O usuário não tem uma conta registrada.', delete_after=60)
+        if user_data.ban_status is None:
+            return await ctx.reply(f'O usuário {user.mention} não está banido.', allowed_mentions=discord.AllowedMentions.none(), delete_after=60)
 
         await self.nayul.db.users.update_ban(user, False)
-        await ctx.send(f'{ctx.author.mention} Usuário desbanido com sucesso!')
+        await ctx.send(f'{ctx.author.mention} **|** Usuário desbanido com sucesso!')
         log.info(f'Usuário {user.id} desbanido por {ctx.author.id}')
 
         try:
@@ -81,7 +70,7 @@ class ModCommands(commands.Cog):
         """Cria um convite para o servidor."""
         guild = self.nayul.get_guild(guild_id)
         if not guild:
-            return await ctx.reply('Servidor não encontrado.')
+            return await ctx.reply('Servidor não encontrado.', delete_after=30)
         try:
             invites = await guild.invites()
             invite = next((invite for invite in invites if invite.max_age == 0 and invite.max_uses == 0), None)
@@ -94,9 +83,9 @@ class ModCommands(commands.Cog):
                     invite = await channel.create_invite(temporary=True)
                     break
         if not invite:
-            return await ctx.reply(f'Não foi possível criar um convite para o servidor {guild.name}.')
+            return await ctx.reply(f'Não foi possível criar um convite para o servidor {guild.name}.', delete_after=30)
         
-        await ctx.send(f'Convite para o servidor {guild.name}:\n{invite}', delete_after=180)
+        await ctx.send(f'Convite para o servidor {guild.name}:\n{invite}', delete_after=300)
         log.info(f'Convite criado para o servidor {guild.name} ({guild.id}) por {ctx.author.id}')
         
 async def setup(nayul: NayulCore):

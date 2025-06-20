@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime
-from pydantic import BaseModel, Field
-
+from pydantic import Field
 from typing import Optional, List
 
-class UserProfile(BaseModel):
+from ._base import BaseDataClass
+
+
+class Profile(BaseDataClass):
     """
     Representa o perfil do usuário.
 
@@ -15,14 +17,10 @@ class UserProfile(BaseModel):
         about_me (`Optional[str]`): Descrição pessoal do usuário.
     """
     skin_now: str = Field(alias='skinNow', default='default')
-    skins: List[str] = ['default']
+    skins: List[str] = Field(default_factory=lambda: ['default'])
     about_me: Optional[str] = Field(alias='aboutMe', default=None)
 
-    class Config:
-        frozen = True
-        validate_by_name = True
-
-class UserCooldowns(BaseModel):
+class Cooldowns(BaseDataClass):
     """
     Gerencia os tempos de espera (cooldowns) do usuário.
 
@@ -37,53 +35,35 @@ class UserCooldowns(BaseModel):
     married: Optional[datetime] = None
     premium_expiration: Optional[datetime] = Field(alias='premiumExpiration', default=None)
 
-    class Config:
-        frozen = True
-        validate_by_name = True
-
-class UserMarried(BaseModel):
+class MarriedStatus(BaseDataClass):
     """
     Representa as informações de casamento do usuário.
 
     Attributes:
-        married (`bool`): Indica se o usuário está casado.
-        division_of_assets (`Optional[bool]`): Indica se há divisão de bens no casamento.
-        married_with (`Optional[int]`): Id do usuário com quem está casado.
-        since (`Optional[datetime]`): Data do casamento.
+        division_of_assets (`bool`): Indica se há divisão de bens no casamento.
+        married_with (`int`): Id do usuário com quem está casado.
+        since (`datetime`): Data do casamento.
+        shared_pearls (`int`): Quantidade de pérolas compartilhadas.
     """
-    married: bool = Field(alias='married', default=False)
-    division_of_assets: Optional[bool] = Field(alias='divisionOfAssets', default=None)
-    married_with: Optional[int] = Field(alias='marriedWith', default=None)
-    since: Optional[datetime] = None
-    shared_pearls: Optional[int] = Field(alias='sharedPearls', default=None)
+    division_of_assets: bool = Field(alias='divisionOfAssets')
+    married_with: int = Field(alias='marriedWith')
+    since: datetime
+    shared_pearls: int = Field(alias='sharedPearls')
 
-    class Config:
-        frozen = True
-        validate_by_name = True
-
-class UserBan(BaseModel):
+class BanStatus(BaseDataClass):
     """
     Representa as informações de banimento do usuário.
 
     Attributes:
-        banned (`bool``): Indica se o usuário está banido.
-        banned_by (`Optional[int]`): Id do usuário que baniu o usuário.
-        banned_at (`Optional[datetime]`): Data do banimento.
-        expires_at (`Optional[datetime]`): Data de expiração do banimento.
-        reason (`Optional[str]`): Motivo do banimento.
+        banned_by (`int`): Id do usuário que baniu o usuário.
+        banned_at (`datetime`): Data do banimento.
+        reason (`str`): Motivo do banimento.
     """
-    banned: bool = False
-    banned_by: Optional[int] = Field(alias='bannedBy', default=None)
-    banned_at: Optional[datetime] = Field(alias='bannedAt', default=None)
-    expires_at: Optional[datetime] = Field(alias='expiresAt', default=None)
-    reason: Optional[str] = None
+    banned_by: int = Field(alias='bannedBy')
+    banned_at: datetime = Field(alias='bannedAt')
+    reason: str = None
 
-    class Config:
-        frozen = True
-        validate_by_name = True
-
-
-class UserData(BaseModel):
+class UserData(BaseDataClass):
     """
     Modelo principal de dados do usuário.
 
@@ -92,10 +72,12 @@ class UserData(BaseModel):
         pearls (`int`): Quantidade de pérolas do usuário.
         experience (`float`): Experiência do usuário.
         reputation (`int`): Reputação do usuário.
+        accepted_terms (`bool`): Indica se os termos de uso foram aceitos.
         cai_uuid (`Optional[str]`): UUID do usuário.
-        profile (`UserProfile`): Perfil do usuário.
-        cooldowns (`UserCooldowns`): Cooldowns do usuário.
-        ban (`UserBan`): Status de banimento do usuário.
+        cooldowns (`Optional[Cooldowns]`): Cooldowns do usuário.
+        married_status (`Optional[MarriedStatus]`): Informações de casamento do usuário.
+        profile (`Optional[Profile]`): Perfil do usuário.
+        ban (`Optional[BanStatus]`): Status de banimento do usuário.
     """
     id: int = Field(alias='_id')
     pearls: int = 0
@@ -103,11 +85,10 @@ class UserData(BaseModel):
     reputation: int = 0
     accepted_terms: bool = Field(alias='acceptedTerms', default=False)
     cai_uuid: Optional[str] = Field(alias='caiUUID', default=None)
-    profile: UserProfile = UserProfile()
-    married: UserMarried = UserMarried()
-    cooldowns: UserCooldowns = UserCooldowns()
-    ban: UserBan = UserBan()
+    profile: Optional[Profile] = Field(default_factory=Profile)
+    cooldowns: Optional[Cooldowns] = Field(default_factory=Cooldowns)
+    married_status: Optional[MarriedStatus] = Field(alias='marriedStatus', default=None)
+    ban_status: Optional[BanStatus] = Field(alias='banStatus', default=None)
 
-    class Config:
-        validate_by_name = True
-        frozen = True
+    def __str__(self) -> str:
+        return f'{UserData.__name__}(id={self.id}, pearls={self.pearls}, accepted_terms={self.accepted_terms})'

@@ -7,7 +7,7 @@ class OwnerCommands(commands.Cog):
     def __init__(self, nayul: NayulCore):
         self.nayul = nayul
 
-    @commands.command(name='sync', description='Sincroniza os comandos da nayul.')
+    @commands.command(name='sync', description='Sincroniza os comandos.')
     @commands.is_owner()
     async def sync(self, ctx: commands.Context[NayulCore]):
         """Sincroniza os comandos da Nayul com o Discord."""
@@ -16,26 +16,29 @@ class OwnerCommands(commands.Cog):
 
     #-------------------- Staff Manager --------------------#
 
-    @commands.group(name='staff', description='Gerencia os staffs da Nayul.')
+    @commands.group(name='staff')
     @commands.is_owner()
     async def staff(self, ctx: commands.Context[NayulCore]):
         """Gerencia os staffs da Nayul."""
         if not ctx.invoked_subcommand:
             await ctx.reply('Use um subcomando: add, remove ou list.', delete_after=60, mention_author=False)
 
-    @staff.command(name='add', description='Adiciona um staff à Nayul.')
+    @staff.command(name='add', description='Adiciona um staff.')
+    @commands.is_owner()
     async def add(self, ctx: commands.Context[NayulCore], user: discord.User):
         """Adiciona um staff à Nayul."""
         await self.nayul.db.settings.update_staffs('add', user.id)
         await ctx.reply(f'{user.mention} foi adicionado como staff.', delete_after=60, mention_author=False)
 
-    @staff.command(name='remove', description='Remove um staff da Nayul')
+    @staff.command(name='remove', description='Remove um staff.')
+    @commands.is_owner()
     async def remove(self, ctx: commands.Context[NayulCore], user: discord.User):
         """Remove um staff da Nayul."""
         await self.nayul.db.settings.update_staffs('remove', user.id)
         await ctx.reply(f'{user.mention} foi removido como staff.', delete_after=60, mention_author=False)
     
-    @staff.command(name='list', description='Lista os staffs da Nayul.')
+    @staff.command(name='list', description='Lista os staffs.')
+    @commands.is_owner()
     async def list(self, ctx: commands.Context[NayulCore]):
         """Lista os staffs da Nayul."""
         settings = await self.nayul.db.settings.get_settings()
@@ -47,14 +50,15 @@ class OwnerCommands(commands.Cog):
 
     #-------------------- Cog Manager --------------------#
         
-    @commands.group(name='cog', description='Gerencia as extensões da Nayul.')
+    @commands.group(name='cog')
     @commands.is_owner()
     async def cogs(self, ctx: commands.Context[NayulCore]):
         """Gerencia as extensões da Nayul."""
         if not ctx.invoked_subcommand:
             await ctx.reply('Use um subcomando: reload, load, unload ou list.', delete_after=60, mention_author=False)
 
-    @cogs.command(name='reload', description='Recarrega uma extensão da Nayul.')
+    @cogs.command(name='reload', description='Recarrega uma extensão.')
+    @commands.is_owner()
     async def reload(self, ctx: commands.Context[NayulCore], extension: str):
         """Recarrega uma extensão ou todas as extensões da Nayul."""
         if extension == 'all':
@@ -68,7 +72,8 @@ class OwnerCommands(commands.Cog):
         await self.nayul.cog_manager.reload_cog_one(self.nayul, extension)
         await ctx.reply(f'Extensão `{extension}` recarregada com sucesso.', delete_after=60, mention_author=False)
 
-    @cogs.command(name='load', description='Carrega uma extensão da Nayul.')
+    @cogs.command(name='load', description='Carrega uma extensão.')
+    @commands.is_owner()
     async def load(self, ctx: commands.Context[NayulCore], extension: str):
         """Carrega uma extensão ou todas as extensões da Nayul."""
         if extension == 'all':
@@ -81,7 +86,8 @@ class OwnerCommands(commands.Cog):
         await self.nayul.cog_manager.load_cog_one(self.nayul, extension)
         await ctx.reply(f'Extensão `{extension}` carregada com sucesso.', delete_after=60, mention_author=False)
 
-    @cogs.command(name='unload', description='Descarrega uma extensão da Nayul.')
+    @cogs.command(name='unload', description='Descarrega uma extensão.')
+    @commands.is_owner()
     async def unload(self, ctx: commands.Context[NayulCore], extension: str):
         """Descarrega uma extensão ou todas as extensões da Nayul."""
         if extension == 'all':
@@ -95,7 +101,8 @@ class OwnerCommands(commands.Cog):
         await self.nayul.cog_manager.unload_cog_one(self.nayul, extension)
         await ctx.reply(f'Extensão `{extension}` descarregada com sucesso.', delete_after=60, mention_author=False)
 
-    @cogs.command(name='list', description='Lista todas as extensões da Nayul.')
+    @cogs.command(name='list', description='Lista todas as extensões.')
+    @commands.is_owner()
     async def extensions(self, ctx: commands.Context[NayulCore]):
         """Lista todas as extensões da Nayul."""
         extensions = self.nayul.cog_manager.extensions.keys()

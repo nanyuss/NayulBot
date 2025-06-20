@@ -1,7 +1,10 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Literal
+import logging
 
 from database.models.settings import Settings
+
+log = logging.getLogger(__name__)
 
 class SettingsDB:
     def __init__(self, client: AsyncIOMotorClient):
@@ -16,10 +19,13 @@ class SettingsDB:
         """
         data = await self.collection.find_one({'_id': 0})
         if data is None:
-            default_settings = Settings().model_dump(by_alias=True)
+            default_settings = Settings().to_dict()
             default_settings['_id'] = 0
             await self.collection.insert_one(default_settings)
+            log.debug('Configurações padrão inseridas no banco de dados.')
             return Settings()
+        
+        log.debug('Settings: %s', data)
         return Settings(**data)
 
     async def update_settings(self, *, query: dict) -> None:
@@ -30,6 +36,7 @@ class SettingsDB:
             query (`dict`): Os dados a serem atualizados.
         """
         await self.collection.update_one({'_id': 0}, query, upsert=True)
+        log.debug('Configurações atualizadas no banco de dados.')
 
     async def update_staffs(self, action: Literal['add', 'remove'], staff_id: int) -> None:
         """
@@ -40,7 +47,7 @@ class SettingsDB:
             staff_id (`int`): O ID do staff a ser adicionado ou removido.
         """
         settings = await self.get_settings()
-        settings_dict = settings.model_dump(by_alias=True)
+        settings_dict = settings.to_dict()
 
         match action:
             case 'add':
@@ -51,3 +58,4 @@ class SettingsDB:
                     settings_dict['staffs'].remove(staff_id)
 
         await self.update_settings(query={'$set': settings_dict})
+        log.debug('Staff %s: %s', action, staff_id)

@@ -3,6 +3,14 @@ from env import ENV
 from datetime import datetime
 from typing import Union, Literal
 
+class Colors:
+    MYSTIC_PURPLE   = 4927093
+    VIBRANT_PURPLE  = 10834034
+    VIOLET_BLACK    = 2831035
+    ICY_WHITE       = 15921906
+    NIGHT_PURPLE    = 1708071
+
+
 def format_api_url(endpoint: str) -> str:
 	"""Formata a URL da API.
 	Args:

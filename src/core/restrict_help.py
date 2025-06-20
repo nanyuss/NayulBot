@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import HelpCommand, Group, Command
 from typing import Mapping, Optional
+from src.utils.others import Colors
 
 class RestrictedHelpCommand(HelpCommand):
     def __init__(self):
@@ -13,7 +14,7 @@ class RestrictedHelpCommand(HelpCommand):
 
         embed = discord.Embed(
             title='📖 Lista de Comandos',
-            color=discord.Color.blurple()
+            color=Colors.MYSTIC_PURPLE,
         )
 
         for cog, commands_list in mapping.items():

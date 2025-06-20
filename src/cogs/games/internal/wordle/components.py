@@ -9,7 +9,7 @@ from src.utils.emojis import Emoji
 class MainView(ui.LayoutView):
     def __init__(self, author: discord.User, word: str, guessed_words: List[Optional[str]] = [], **kwargs):
         """View principal do jogo Wordle."""
-        super().__init__(timeout=30)
+        super().__init__(timeout=300)
         self.kwargs = kwargs # Armazena os argumentos adicionais
         self.author = author # Usuário que usou o comando
         self.word = word # Palavra que o usuário tem que adivinhar
@@ -39,9 +39,10 @@ class MainView(ui.LayoutView):
                                 subitem.style = discord.ButtonStyle.red
                                 subitem.disabled = True
                                 subitem.emoji = Emoji.error
-                                subitem.label = 'Você perdeu!'
+                                subitem.label = f'Você perdeu! (palavra: {self.word})'
                             case 'timeout':
                                 subitem.disabled = True
+                                subitem.label = 'Tempo esgotado! (palavra: {self.word})'
 
     async def update_container(self):
         """Atualiza o container da view."""

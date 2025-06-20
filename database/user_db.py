@@ -1,6 +1,6 @@
 import discord
 from motor.motor_asyncio import AsyncIOMotorClient
-from typing import Optional, Union, Literal
+from typing import Optional, Union, Literal, AsyncGenerator, List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -18,7 +18,7 @@ class UsersDB:
             user (`Union[discord.Member, discord.User]`): O usuário para criar a conta.
         """
         await self.collection.insert_one(
-            UserData(id=user.id).model_dump(by_alias=True)
+            UserData(id=user.id).to_dict()
         )
 
     #---------- Get info ----------#
@@ -36,7 +36,6 @@ class UsersDB:
         data: Optional[dict] = await self.collection.find_one({'_id': user.id})
         if data is None:
             return UserData(id=user.id)
-
         return UserData(**data)
     
     #---------- Delete Info ----------#
@@ -62,7 +61,7 @@ class UsersDB:
         """
         await self.collection.update_one({'_id': user.id}, query)
 
-    async def update_ban(self, user: Union[discord.Member, discord.User], banned: bool, banned_by: Optional[int] = None, expired_in: Optional[datetime] = None, reason: Optional[str] = None) -> None:
+    async def update_ban(self, user: Union[discord.Member, discord.User], banned: bool, banned_by: Optional[int] = None, reason: Optional[str] = None) -> None:
         """
         Atualiza o status de banimento de um usuário no banco de dados.
 
@@ -70,18 +69,18 @@ class UsersDB:
             user (`Union[discord.Member, discord.User]`): O usuário para atualizar o status de banimento.
             banned (`bool`): Indica se o usuário está banido.
             banned_by (`Optional[int]`): ID do usuário que realizou o banimento.
-            expired_in (`Optional[datetime]`): Data de expiração do banimento.
             reason (`Optional[str]`): Motivo do banimento.
         """
-        
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
-
-        user_dict['ban']['banned'] = banned
-        user_dict['ban']['bannedBy'] = banned_by
-        user_dict['ban']['bannedAt'] = None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
-        user_dict['ban']['expiresAt'] = expired_in.isoformat() if expired_in else None
-        user_dict['ban']['reason'] = reason
+        user_dict = user_data.to_dict()
+        if banned:
+            user_dict['banStatus'] = {
+                'bannedBy': banned_by,
+                'bannedAt': None if not banned else datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat(),
+                'reason': reason
+            }
+        else:
+            user_dict['banStatus'] = None
 
         await self.update_user(user, query={'$set': user_dict})
 
@@ -96,7 +95,7 @@ class UsersDB:
         """
         
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         match action:
             case 'add':
@@ -121,7 +120,7 @@ class UsersDB:
         """
 
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         user_dict['profile']['aboutMe'] = about_me
 
@@ -138,7 +137,7 @@ class UsersDB:
         """
 
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         match action:
             case 'add':
@@ -161,7 +160,7 @@ class UsersDB:
         """
 
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         match action:
             case 'add':
@@ -182,7 +181,7 @@ class UsersDB:
         """
 
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         match action:
             case 'add':
@@ -202,7 +201,7 @@ class UsersDB:
         """
 
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         user_dict['caiUUID'] = cai_uuid
 
@@ -220,37 +219,32 @@ class UsersDB:
             married_with (`Union[discord.Member, discord.User]`): O usuário com o qual o usuário está casado.
             married (`bool`): Indica se o usuário está casado.
             division_of_assets (`Optional[bool]`): Indica se há divisão de bens no casamento.
-            since (`Optional[datetime]`): Data do casamento.
         """
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
+        user_dict = user_data.to_dict()
 
         married_with_data = await self.get_user(married_with)
-        married_with_dict = married_with_data.model_dump(by_alias=True)
+        married_with_dict = married_with_data.to_dict()
 
         if married:
-            user_dict['married']['married'] = married
-            user_dict['married']['marriedWith'] = married_with.id
-            user_dict['married']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
-            user_dict['married']['divisionOfAssets'] = division_of_assets
+            user_dict['marriedStatus']['marriedWith'] = married_with.id
+            user_dict['marriedStatus']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo'))
+            user_dict['marriedStatus']['divisionOfAssets'] = division_of_assets
 
-            married_with_dict['married']['married'] = married
-            married_with_dict['married']['marriedWith'] = user.id
-            married_with_dict['married']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo')).isoformat()
-            married_with_dict['married']['divisionOfAssets'] = division_of_assets
+            married_with_dict['marriedStatus']['marriedWith'] = user.id
+            married_with_dict['marriedStatus']['since'] = datetime.now(tz=ZoneInfo('America/Sao_Paulo'))
+            married_with_dict['marriedStatus']['divisionOfAssets'] = division_of_assets
 
             await self.update_shared_pearls(user, married_with)
 
         else:
-            user_dict['married']['married'] = married
-            user_dict['married']['marriedWith'] = None
-            user_dict['married']['since'] = None
-            user_dict['married']['divisionOfAssets'] = None
+            user_dict['marriedStatus']['marriedWith'] = None
+            user_dict['marriedStatus']['since'] = None
+            user_dict['marriedStatus']['divisionOfAssets'] = None
 
-            married_with_dict['married']['married'] = False
-            married_with_dict['married']['marriedWith'] = None
-            married_with_dict['married']['since'] = married
-            married_with_dict['married']['divisionOfAssets'] = None
+            married_with_dict['marriedStatus']['marriedWith'] = None
+            married_with_dict['marriedStatus']['since'] = married
+            married_with_dict['marriedStatus']['divisionOfAssets'] = None
 
         await self.update_user(user, query={'$set': user_dict})
         await self.update_user(married_with, query={'$set': married_with_dict})
@@ -267,10 +261,10 @@ class UsersDB:
         """
 
         user1_data = await self.get_user(user1)
-        user1_dict = user1_data.model_dump(by_alias=True)
+        user1_dict = user1_data.to_dict()
 
         user2_data = await self.get_user(user2)
-        user2_dict = user2_data.model_dump(by_alias=True)
+        user2_dict = user2_data.to_dict()
 
         total_shared_pearls = user1_dict['pearls'] + user2_dict['pearls']
         division_shared_perals = total_shared_pearls // 2
@@ -279,8 +273,8 @@ class UsersDB:
             await self.update_pearls(user1, 'set', division_shared_perals)
             await self.update_pearls(user2, 'set', division_shared_perals)
 
-        user1_dict['married']['sharedPearls'] = total_shared_pearls
-        user2_dict['married']['sharedPearls'] = total_shared_pearls
+        user1_dict['marriedStatus']['sharedPearls'] = total_shared_pearls
+        user2_dict['marriedStatus']['sharedPearls'] = total_shared_pearls
 
         await self.update_user(user1, query={'$set': user1_dict})
         await self.update_user(user2, query={'$set': user2_dict})
@@ -294,35 +288,52 @@ class UsersDB:
         Args:
             user (`Union[discord.Member, discord.User]`): O usuário para atualizar os cooldowns.
             cooldown (`Literal['daily', 'reputation', 'married', 'premium_expiration']`): O cooldown a ser atualizado.
-            datetime_now (`datetime`): O novo timestamp do cooldown.
+            timestamp (`datetime`): O novo timestamp do cooldown.
         """
         user_data = await self.get_user(user)
-        user_dict = user_data.model_dump(by_alias=True)
-        user_dict['cooldowns'][cooldown] = datetime_now.isoformat()
+        user_dict = user_data.to_dict()
+        user_dict['cooldowns'][cooldown] = datetime_now
         await self.update_user(user, query={'$set': user_dict})
 
     #---------- Get all infos ----------#
 
-    async def get_all_users(self) -> list[UserData]:
+    async def get_all_users(self, size: int = 25) -> AsyncGenerator[List[UserData]]:
         """
         Obtém todos os usuários do banco de dados.
 
+        Args:
+            size (`int`): O número de usuários a serem retornados por página.
+
         Returns:
-            list[UserData]: Lista de todos os usuários.
+            AsyncGenerator[UserData]: Gerador de usuários.
         """
-        users = []
-        async for user in self.collection.find():
-            users.append(UserData(**user))
-        return users
+
+        skip = 0
+
+        while True:
+            cursor = self.collection.find().skip(skip).limit(size)
+            page = await cursor.to_list(length=size)
+            if not page:
+                break
+            yield [UserData(**user) for user in page]
     
-    async def get_all_users_banned(self) -> list[UserData]:
+    async def get_all_users_banned(self, size: int = 25) -> AsyncGenerator[List[UserData]]:
         """
         Obtém todos os usuários banidos do banco de dados.
 
+        Args:
+            size (`int`): O número de usuários a serem retornados por página.
+
         Returns:
-            list[UserData]: Lista de todos os usuários banidos.
+            AsyncGenerator[UserData]: Gerador de usuários banidos.
         """
-        users = []
-        async for user in self.collection.find({'ban.banned': True}):
-            users.append(UserData(**user))
-        return users
+        skip = 0
+
+        while True:
+            cursor = self.collection.find({'banStatus': {'$ne': None}}).skip(skip).limit(size)
+            page = await cursor.to_list(length=size)
+            if not page:
+                break
+
+            yield [UserData(**user) for user in page]
+            skip += size
