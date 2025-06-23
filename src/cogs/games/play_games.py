@@ -7,8 +7,8 @@ from typing import Set
 
 from src import NayulCore
 from src.utils import nayul_decorators
-from .internal.shiritori import MainView as MainViewShiritori
-from .internal.wordle import MainView as MainViewWordle
+from ._internal.shiritori import MainView as MainViewShiritori
+from ._internal.wordle import MainView as MainViewWordle
 
 class PlayGames(commands.Cog):
     def __init__(self, nayul: NayulCore):
