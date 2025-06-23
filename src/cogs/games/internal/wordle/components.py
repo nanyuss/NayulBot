@@ -35,14 +35,16 @@ class MainView(ui.LayoutView):
                                 subitem.disabled = True
                                 subitem.emoji = Emoji.check
                                 subitem.label = 'Você venceu!'
+                                self.stop()
                             case 'loser':
                                 subitem.style = discord.ButtonStyle.red
                                 subitem.disabled = True
                                 subitem.emoji = Emoji.error
                                 subitem.label = f'Você perdeu! (palavra: {self.word})'
+                                self.stop()
                             case 'timeout':
                                 subitem.disabled = True
-                                subitem.label = 'Tempo esgotado! (palavra: {self.word})'
+                                subitem.label = f'Tempo esgotado! (palavra: {self.word})'
 
     async def update_container(self):
         """Atualiza o container da view."""
