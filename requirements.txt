@@ -8,4 +8,3 @@ psutil
 unidecode
 motor
 tzdata
-pillow
