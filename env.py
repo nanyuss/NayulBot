@@ -1,10 +1,13 @@
 import os
 import sys
+import logging
 from dotenv import load_dotenv
 from typing import List, Optional
 from dataclasses import dataclass
 
 load_dotenv()  # Carrega variáveis do .env
+
+log = logging.getLogger(__name__)
 
 def _str_to_list_of_ints(value: str) -> List[int]:
     return [int(v.strip()) for v in value.split(',') if v.strip().isdigit()]
@@ -12,7 +15,7 @@ def _str_to_list_of_ints(value: str) -> List[int]:
 def _validate_required(var_name: str, validator=lambda x: bool(x)) -> str:
     value = os.getenv(var_name)
     if not value or not validator(value):
-        print(f'[ENV] Erro: a variável obrigatória "{var_name} está ausente ou inválida.')
+        log.critical(f'[ENV] Erro: a variável obrigatória "{var_name}" está ausente ou inválida.')
         sys.exit(1)
     return value
 
@@ -25,11 +28,11 @@ class Env:
     # Obrigatórios
     TOKEN: str
     OWNER_IDS: List[int]
+    MONGO: str
     INTERNAL_API: str
 
     # Opcionais (com valores padrão)
     PREFIX: str = ',,'
-    MONGO: str = 'mongodb://localhost:27017/'
     GITHUB_TOKEN: Optional[str] = None
     GITHUB_USERNAME: Optional[str] = None
 
@@ -42,7 +45,7 @@ class Env:
             OWNER_IDS=_str_to_list_of_ints(_validate_required('OWNER_IDS')),
             INTERNAL_API=_validate_required('INTERNAL_API'),
             PREFIX=os.getenv('PREFIX', ',,'),
-            MONGO=os.getenv('MONGO', 'mongodb://localhost:27017/'),
+            MONGO=_validate_required('MONGO')
         )
 
 ENV = Env.load()
