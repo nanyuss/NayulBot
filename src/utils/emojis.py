@@ -1,9 +1,5 @@
 class Emoji:
     """Classe para armazenar os emojis do bot."""
-    bug_hunter = '<:bug_hunter:1379554733731352647>'
-    bug_hunter_level_2 = '<:bug_hunter_level_2:1379554759782170768>'
-    check = '<:check:1379554738529636463>'
-    crown = '<:crown:1379554758821417121>'
     delete = '<:delete:1379554740383514794>'
     discord_certified_moderator = '<:discord_certified_moderator:1379554759564066834>'
     discord_icon = '<:discord_icon:1379554739762757652>'
@@ -59,6 +55,10 @@ class Emoji:
     back = '<:back:1379554756942368778>'
     banner = '<:banner:1379554737455894579>'
     booster_lv1 = '<:booster_lv1:1379554758406443159>'
+    bug_hunter = '<:bug_hunter:1379554733731352647>'
+    bug_hunter_level_2 = '<:bug_hunter_level_2:1379554759782170768>'
+    check = '<:check:1379554738529636463>'
+    crown = '<:crown:1379554758821417121>'
 
     @classmethod
     def update(cls, **kwargs):

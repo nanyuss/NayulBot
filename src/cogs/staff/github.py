@@ -19,6 +19,7 @@ class GitHubCommands(commands.Cog):
 
     @commands.group(name='wordle', invoke_without_command=True)
     @nayul_decorators.is_staff()
+    @commands.cooldown(1, 120, commands.BucketType.user)
     async def wordle(self, ctx: commands.Context[NayulCore]):
         """Mostra ajuda do grupo *wordle* se nenhum subcomando for passado."""
         if not ctx.invoked_subcommand:
@@ -65,6 +66,7 @@ class GitHubCommands(commands.Cog):
 
     @wordle.command(name='list', description='Lista todas as palavras do wordle no arquivo remoto.')
     @nayul_decorators.is_staff()
+    @commands.cooldown(1, 120, commands.BucketType.user)
     async def words_list(self, ctx: commands.Context) -> None:
         """Lista todas as palavras de 5 letras no arquivo remoto."""
         try:

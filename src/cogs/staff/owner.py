@@ -11,8 +11,11 @@ class OwnerCommands(commands.Cog):
     @commands.is_owner()
     async def sync(self, ctx: commands.Context[NayulCore]):
         """Sincroniza os comandos da Nayul com o Discord."""
-        cmd = await self.nayul.tree.sync()
-        await ctx.reply(f'Comandos sincronizados com sucesso. ({len(cmd)})', delete_after=60, mention_author=False)
+        try:
+            cmd = await self.nayul.tree.sync()
+            await ctx.reply(f'Comandos sincronizados com sucesso. ({len(cmd)})', delete_after=60, mention_author=False)
+        except Exception as e:
+            await ctx.reply(f'Erro ao sincronizar os comandos: {e}', delete_after=60, mention_author=False)
 
     #-------------------- Staff Manager --------------------#
 
