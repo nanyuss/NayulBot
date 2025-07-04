@@ -16,8 +16,8 @@ class CogManager:
     async def load_cogs(self, nayul: 'NayulCore'):
         """ Carrega todas as extensões do bot. """
         for root, _, files in os.walk(self.path): # Caminho para as extensões
-            # Ignora qualquer diretório que contenha 'internal' no caminho
-            if 'internal' in root.split(os.path.sep):
+            # Ignora qualquer diretório que contenha '_internal' no caminho
+            if '_internal' in root.split(os.path.sep):
                 continue
             for file in files: # Percorre os arquivos no diretório
                 if file.endswith('.py'): # Verifica se o arquivo é um arquivo python

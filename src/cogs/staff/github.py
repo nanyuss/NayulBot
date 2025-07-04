@@ -41,7 +41,7 @@ class GitHubCommands(commands.Cog):
 
         adicionadas = await self._edit_words(add=list(words), author=str(ctx.author))
         if adicionadas:
-            await ctx.send(f'✅ Adicionadas {len(adicionadas)} palavra(s): {', '.join(adicionadas)}')
+            await ctx.send(f'✅ Adicionadas {len(adicionadas)} palavra(s): {", ".join(adicionadas)}')
         else:
             await ctx.send('🤔 Nenhuma palavra nova foi adicionada (já existiam ou eram inválidas).')
 
