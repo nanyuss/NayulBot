@@ -161,7 +161,7 @@ class PlayerStatusSelect(ui.Select):
         if s.get('end') and s.get('start'):
             time = str(s['end'] - s['start']).split('.')[0]
         embed = discord.Embed(
-            title=f'{Emoji.icon_user} Estatísticas de {s['player'].display_name}',
+            title=f'{Emoji.icon_user} Estatísticas de {s["player"].display_name}',
             color=discord.Color.blurple()
         ).set_thumbnail(url=s['player'].display_avatar.url)
         embed.add_field(name='📝 Palavras válidas', value=f'```{len(words)}```', inline=False)

@@ -41,7 +41,7 @@ class GitHubCommands(commands.Cog):
 
         adicionadas = await self._edit_words(add=list(words), author=str(ctx.author))
         if adicionadas:
-            await ctx.send(f'✅ Adicionadas {len(adicionadas)} palavra(s): {', '.join(adicionadas)}')
+            await ctx.send(f'✅ Adicionadas {len(adicionadas)} palavra(s): {", ".join(adicionadas)}')
         else:
             await ctx.send('🤔 Nenhuma palavra nova foi adicionada (já existiam ou eram inválidas).')
 
@@ -60,7 +60,7 @@ class GitHubCommands(commands.Cog):
 
         removidas = await self._edit_words(remove=list(words), author=str(ctx.author))
         if removidas:
-            await ctx.send(f'🗑️ Removidas {len(removidas)} palavra(s): {', '.join(removidas)}')
+            await ctx.send(f'🗑️ Removidas {len(removidas)} palavra(s): {", ".join(removidas)}')
         else:
             await ctx.send('🤔 Nenhuma das palavras fornecidas estava na lista.')
 
@@ -124,7 +124,7 @@ class GitHubCommands(commands.Cog):
             commit_msg_parts.append(f'add {len(added)} word(s)')
         if removed:
             commit_msg_parts.append(f'remove {len(removed)} word(s)')
-        commit_message = f'words: {', '.join(commit_msg_parts)} (by {author})'
+        commit_message = f'words: {", ".join(commit_msg_parts)} (by {author})'
 
         await self.client.update_file(
             owner=ENV.GITHUB_USERNAME,
